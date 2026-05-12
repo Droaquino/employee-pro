@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RelatoriosRouteImport } from './routes/relatorios'
 import { Route as ProximosVencimentosRouteImport } from './routes/proximos-vencimentos'
 import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as EmRiscoRouteImport } from './routes/em-risco'
@@ -16,6 +17,11 @@ import { Route as ContratosRouteImport } from './routes/contratos'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EmpresasIdRouteImport } from './routes/empresas.$id'
 
+const RelatoriosRoute = RelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProximosVencimentosRoute = ProximosVencimentosRouteImport.update({
   id: '/proximos-vencimentos',
   path: '/proximos-vencimentos',
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/em-risco': typeof EmRiscoRoute
   '/empresas': typeof EmpresasRouteWithChildren
   '/proximos-vencimentos': typeof ProximosVencimentosRoute
+  '/relatorios': typeof RelatoriosRoute
   '/empresas/$id': typeof EmpresasIdRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/em-risco': typeof EmRiscoRoute
   '/empresas': typeof EmpresasRouteWithChildren
   '/proximos-vencimentos': typeof ProximosVencimentosRoute
+  '/relatorios': typeof RelatoriosRoute
   '/empresas/$id': typeof EmpresasIdRoute
 }
 export interface FileRoutesById {
@@ -70,6 +78,7 @@ export interface FileRoutesById {
   '/em-risco': typeof EmRiscoRoute
   '/empresas': typeof EmpresasRouteWithChildren
   '/proximos-vencimentos': typeof ProximosVencimentosRoute
+  '/relatorios': typeof RelatoriosRoute
   '/empresas/$id': typeof EmpresasIdRoute
 }
 export interface FileRouteTypes {
@@ -80,6 +89,7 @@ export interface FileRouteTypes {
     | '/em-risco'
     | '/empresas'
     | '/proximos-vencimentos'
+    | '/relatorios'
     | '/empresas/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -88,6 +98,7 @@ export interface FileRouteTypes {
     | '/em-risco'
     | '/empresas'
     | '/proximos-vencimentos'
+    | '/relatorios'
     | '/empresas/$id'
   id:
     | '__root__'
@@ -96,6 +107,7 @@ export interface FileRouteTypes {
     | '/em-risco'
     | '/empresas'
     | '/proximos-vencimentos'
+    | '/relatorios'
     | '/empresas/$id'
   fileRoutesById: FileRoutesById
 }
@@ -105,10 +117,18 @@ export interface RootRouteChildren {
   EmRiscoRoute: typeof EmRiscoRoute
   EmpresasRoute: typeof EmpresasRouteWithChildren
   ProximosVencimentosRoute: typeof ProximosVencimentosRoute
+  RelatoriosRoute: typeof RelatoriosRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/relatorios': {
+      id: '/relatorios'
+      path: '/relatorios'
+      fullPath: '/relatorios'
+      preLoaderRoute: typeof RelatoriosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/proximos-vencimentos': {
       id: '/proximos-vencimentos'
       path: '/proximos-vencimentos'
@@ -172,6 +192,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmRiscoRoute: EmRiscoRoute,
   EmpresasRoute: EmpresasRouteWithChildren,
   ProximosVencimentosRoute: ProximosVencimentosRoute,
+  RelatoriosRoute: RelatoriosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
