@@ -2,6 +2,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useAppStore } from "@/store/appStore";
 import { calcStatus } from "@/hooks/useStatusContrato";
+import logo from "@/assets/arbrent-logo.png";
 
 type Item = {
   to: string;
