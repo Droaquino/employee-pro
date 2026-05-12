@@ -9,38 +9,154 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RelatoriosRouteImport } from './routes/relatorios'
+import { Route as ProximosVencimentosRouteImport } from './routes/proximos-vencimentos'
+import { Route as EmpresasRouteImport } from './routes/empresas'
+import { Route as EmRiscoRouteImport } from './routes/em-risco'
+import { Route as ContratosRouteImport } from './routes/contratos'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EmpresasIdRouteImport } from './routes/empresas.$id'
 
+const RelatoriosRoute = RelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProximosVencimentosRoute = ProximosVencimentosRouteImport.update({
+  id: '/proximos-vencimentos',
+  path: '/proximos-vencimentos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmpresasRoute = EmpresasRouteImport.update({
+  id: '/empresas',
+  path: '/empresas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmRiscoRoute = EmRiscoRouteImport.update({
+  id: '/em-risco',
+  path: '/em-risco',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContratosRoute = ContratosRouteImport.update({
+  id: '/contratos',
+  path: '/contratos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmpresasIdRoute = EmpresasIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => EmpresasRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/contratos': typeof ContratosRoute
+  '/em-risco': typeof EmRiscoRoute
+  '/empresas': typeof EmpresasRouteWithChildren
+  '/proximos-vencimentos': typeof ProximosVencimentosRoute
+  '/relatorios': typeof RelatoriosRoute
+  '/empresas/$id': typeof EmpresasIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/contratos': typeof ContratosRoute
+  '/em-risco': typeof EmRiscoRoute
+  '/empresas': typeof EmpresasRouteWithChildren
+  '/proximos-vencimentos': typeof ProximosVencimentosRoute
+  '/relatorios': typeof RelatoriosRoute
+  '/empresas/$id': typeof EmpresasIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/contratos': typeof ContratosRoute
+  '/em-risco': typeof EmRiscoRoute
+  '/empresas': typeof EmpresasRouteWithChildren
+  '/proximos-vencimentos': typeof ProximosVencimentosRoute
+  '/relatorios': typeof RelatoriosRoute
+  '/empresas/$id': typeof EmpresasIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/contratos'
+    | '/em-risco'
+    | '/empresas'
+    | '/proximos-vencimentos'
+    | '/relatorios'
+    | '/empresas/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/contratos'
+    | '/em-risco'
+    | '/empresas'
+    | '/proximos-vencimentos'
+    | '/relatorios'
+    | '/empresas/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/contratos'
+    | '/em-risco'
+    | '/empresas'
+    | '/proximos-vencimentos'
+    | '/relatorios'
+    | '/empresas/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ContratosRoute: typeof ContratosRoute
+  EmRiscoRoute: typeof EmRiscoRoute
+  EmpresasRoute: typeof EmpresasRouteWithChildren
+  ProximosVencimentosRoute: typeof ProximosVencimentosRoute
+  RelatoriosRoute: typeof RelatoriosRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/relatorios': {
+      id: '/relatorios'
+      path: '/relatorios'
+      fullPath: '/relatorios'
+      preLoaderRoute: typeof RelatoriosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/proximos-vencimentos': {
+      id: '/proximos-vencimentos'
+      path: '/proximos-vencimentos'
+      fullPath: '/proximos-vencimentos'
+      preLoaderRoute: typeof ProximosVencimentosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/empresas': {
+      id: '/empresas'
+      path: '/empresas'
+      fullPath: '/empresas'
+      preLoaderRoute: typeof EmpresasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/em-risco': {
+      id: '/em-risco'
+      path: '/em-risco'
+      fullPath: '/em-risco'
+      preLoaderRoute: typeof EmRiscoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contratos': {
+      id: '/contratos'
+      path: '/contratos'
+      fullPath: '/contratos'
+      preLoaderRoute: typeof ContratosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +164,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/empresas/$id': {
+      id: '/empresas/$id'
+      path: '/$id'
+      fullPath: '/empresas/$id'
+      preLoaderRoute: typeof EmpresasIdRouteImport
+      parentRoute: typeof EmpresasRoute
+    }
   }
 }
 
+interface EmpresasRouteChildren {
+  EmpresasIdRoute: typeof EmpresasIdRoute
+}
+
+const EmpresasRouteChildren: EmpresasRouteChildren = {
+  EmpresasIdRoute: EmpresasIdRoute,
+}
+
+const EmpresasRouteWithChildren = EmpresasRoute._addFileChildren(
+  EmpresasRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ContratosRoute: ContratosRoute,
+  EmRiscoRoute: EmRiscoRoute,
+  EmpresasRoute: EmpresasRouteWithChildren,
+  ProximosVencimentosRoute: ProximosVencimentosRoute,
+  RelatoriosRoute: RelatoriosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
