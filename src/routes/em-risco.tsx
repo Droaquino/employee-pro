@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader, Surface } from "@/components/Surface";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { useAppStore } from "@/store/appStore";
 import { calcStatus } from "@/hooks/useStatusContrato";
 import { RiscoBarChart } from "@/components/charts/RiscoBarChart";
@@ -25,6 +26,7 @@ function EmRisco() {
 
   return (
     <div>
+      <Breadcrumb items={[{ label: "Alertas" }, { label: "Em risco" }]} />
       <PageHeader
         title="Contratos em risco"
         subtitle={`${contratos.length} contrato(s) com vencimento em até 15 dias ou já vencidos.`}

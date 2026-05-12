@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageHeader, Surface } from "@/components/Surface";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { EmptyState } from "@/components/EmptyState";
 import { useAppStore } from "@/store/appStore";
 import { EmpresaForm } from "@/components/EmpresaForm";
 import type { Empresa } from "@/data/mock";
@@ -44,6 +46,7 @@ function EmpresasPage() {
 
   return (
     <div>
+      <Breadcrumb items={[{ label: "Gestão" }, { label: "Empresas" }]} />
       <PageHeader
         title="Empresas"
         subtitle="Carteira de empresas clientes e seus contratos ativos."
@@ -120,7 +123,18 @@ function EmpresasPage() {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={6} className="py-6 text-center" style={{ color: "#64748b" }}>Nenhuma empresa encontrada.</td></tr>
+                <tr><td colSpan={6}>
+                  <EmptyState
+                    icon="search"
+                    title="Nenhuma empresa encontrada"
+                    subtitle={query ? "Tente outro termo de busca." : "Cadastre uma nova empresa para começar."}
+                    action={query ? (
+                      <button onClick={() => setQuery("")} className="text-[12px] px-3 py-1.5 rounded-md text-white" style={{ background: "#071040" }}>
+                        Limpar busca
+                      </button>
+                    ) : undefined}
+                  />
+                </td></tr>
               )}
             </tbody>
           </table>
