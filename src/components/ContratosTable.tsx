@@ -1,6 +1,7 @@
 import { format, parseISO } from "date-fns";
 import { acaoRecomendada, calcStatus, maskCpf } from "@/hooks/useStatusContrato";
 import { STATUS_COLOR, STATUS_LABEL } from "@/constants/colors";
+import { formatDiasRestantes } from "@/lib/format";
 import type { Contrato } from "@/data/mock";
 
 export function ContratosTable({ contratos }: { contratos: Contrato[] }) {
@@ -43,9 +44,10 @@ export function ContratosTable({ contratos }: { contratos: Contrato[] }) {
                 </span>
               </Td>
               <Td>
-                <span style={{ color: info.diasRestantes < 0 ? STATUS_COLOR.VENCIDO : "#0f172a", fontWeight: info.diasRestantes <= 15 ? 600 : 400 }}>
-                  {info.diasRestantes}d
-                </span>
+                {(() => {
+                  const f = formatDiasRestantes(info.diasRestantes);
+                  return <span style={{ color: f.cor, fontWeight: f.bold ? 600 : 400 }}>{f.texto}</span>;
+                })()}
               </Td>
               <Td>
                 <span style={{ color: info.status === "VENCIDO" ? STATUS_COLOR.VENCIDO : info.status === "RISCO" ? STATUS_COLOR.risco : "#0f172a", fontWeight: info.status === "VENCIDO" || info.status === "RISCO" ? 600 : 400 }}>

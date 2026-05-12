@@ -1,3 +1,5 @@
+import { addDays, startOfDay, subDays } from "date-fns";
+
 export type Empresa = {
   id: string;
   razaoSocial: string;
@@ -31,13 +33,8 @@ export const responsaveis = [
   { id: "u4", nome: "Rafael Mendes" },
 ];
 
-const today = new Date();
+const today = startOfDay(new Date());
 const iso = (d: Date) => d.toISOString().slice(0, 10);
-const addDays = (base: Date, days: number) => {
-  const d = new Date(base);
-  d.setDate(d.getDate() + days);
-  return d;
-};
 
 export const empresas: Empresa[] = [
   { id: "e1", razaoSocial: "Construtora Vértice S.A.", cnpj: "12.345.678/0001-90", nomeFantasia: "Vértice", responsavelId: "u1", email: "rh@vertice.com.br", telefone: "(11) 3456-7890", ativo: true, criadoEm: "2024-03-12" },
@@ -50,64 +47,56 @@ export const empresas: Empresa[] = [
 ];
 
 const cargos = ["Auxiliar Administrativo", "Operador de Logística", "Analista Financeiro", "Vendedor", "Mecânico", "Técnico de TI", "Recepcionista", "Enfermeiro", "Soldador", "Motorista"];
-const nomes = ["João da Silva", "Maria Oliveira", "Pedro Santos", "Ana Costa", "Lucas Pereira", "Juliana Almeida", "Bruno Ferreira", "Camila Rocha", "Diego Lima", "Fernanda Souza", "Gabriel Martins", "Helena Ribeiro", "Igor Cardoso", "Larissa Nunes", "Marcos Teixeira", "Natália Barros", "Otávio Dias", "Patrícia Gomes", "Rodrigo Pinto", "Sofia Carvalho", "Thiago Ramos", "Vitória Mendes", "Wesley Araújo", "Yasmin Castro"];
+const nomes = ["João da Silva", "Maria Oliveira", "Pedro Santos", "Ana Costa", "Lucas Pereira", "Juliana Almeida", "Bruno Ferreira", "Camila Rocha", "Diego Lima", "Fernanda Souza", "Gabriel Martins", "Helena Ribeiro", "Igor Cardoso", "Larissa Nunes", "Marcos Teixeira", "Natália Barros", "Otávio Dias", "Patrícia Gomes", "Rodrigo Pinto", "Sofia Carvalho", "Thiago Ramos", "Vitória Mendes", "Wesley Araújo", "Yasmin Castro", "Beatriz Lopes", "Caio Moraes", "Daniela Freitas", "Eduardo Pires", "Flávia Tavares", "Gustavo Reis"];
+const empresaIds = ["e1", "e2", "e3", "e4", "e5", "e7"];
 
 const cpf = (i: number) => {
   const base = (10000000000 + i * 31337).toString().padStart(11, "0").slice(0, 11);
   return `${base.slice(0, 3)}.${base.slice(3, 6)}.${base.slice(6, 9)}-${base.slice(9, 11)}`;
 };
 
-// Generate contratos in spread of statuses across empresas
-const contratosGen: Contrato[] = [];
-let cid = 1;
-let nIdx = 0;
-const dist = [
-  { empresaId: "e1", count: 12 },
-  { empresaId: "e2", count: 9 },
-  { empresaId: "e3", count: 6 },
-  { empresaId: "e4", count: 14 },
-  { empresaId: "e5", count: 11 },
-  { empresaId: "e7", count: 8 },
+// pseudo-random determinístico
+const rnd = (seed: number) => {
+  let x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+};
+
+type Bucket = { count: number; minDays: number; maxDays: number; encerrado?: boolean };
+const buckets: Bucket[] = [
+  { count: 15, minDays: 31, maxDays: 90 },   // vigentes
+  { count: 20, minDays: 16, maxDays: 30 },   // próximos
+  { count: 15, minDays: 1, maxDays: 15 },    // risco
+  { count: 6, minDays: -30, maxDays: -1 },   // vencidos
+  { count: 5, minDays: -120, maxDays: -40, encerrado: true }, // encerrados
 ];
 
-for (const { empresaId, count } of dist) {
-  for (let i = 0; i < count; i++) {
-    // Spread admission dates from -170 to -10 days
-    const offset = -170 + Math.floor((160 / count) * i) + (cid % 7);
-    const admissao = addDays(today, offset);
-    const v1 = addDays(admissao, 90);
-    const v2 = addDays(admissao, 180);
-    const isOnSecond = offset < -90;
+const motivos = ["Efetivado", "Não renovado", "Pedido de demissão", "Efetivado", "Efetivado"];
+const contratosGen: Contrato[] = [];
+let cid = 1;
+
+for (const b of buckets) {
+  for (let i = 0; i < b.count; i++) {
+    const range = b.maxDays - b.minDays;
+    const offset = b.minDays + Math.floor(rnd(cid * 13.7) * (range + 1));
+    const vencSegundo = addDays(today, offset);
+    const dataAdmissao = subDays(vencSegundo, 180);
+    const vencPrimeiro = addDays(dataAdmissao, 90);
+    const empresaId = empresaIds[cid % empresaIds.length];
     contratosGen.push({
       id: `c${cid}`,
       empresaId,
-      funcionarioNome: nomes[nIdx % nomes.length],
+      funcionarioNome: nomes[(cid - 1) % nomes.length],
       funcionarioCpf: cpf(cid),
-      cargo: cargos[(cid + i) % cargos.length],
-      dataAdmissao: iso(admissao),
-      vencimentoPrimeiro: iso(v1),
-      vencimentoSegundo: iso(v2),
-      prorrogacaoAtual: isOnSecond ? 2 : 1,
-      encerrado: false,
+      cargo: cargos[cid % cargos.length],
+      dataAdmissao: iso(dataAdmissao),
+      vencimentoPrimeiro: iso(vencPrimeiro),
+      vencimentoSegundo: iso(vencSegundo),
+      prorrogacaoAtual: 2,
+      encerrado: !!b.encerrado,
+      motivoEncerramento: b.encerrado ? motivos[i % motivos.length] : undefined,
     });
     cid++;
-    nIdx++;
   }
 }
-
-// Add a few encerrados to feed funnel
-contratosGen.push({
-  id: `c${cid++}`,
-  empresaId: "e1",
-  funcionarioNome: "Eduarda Pires",
-  funcionarioCpf: cpf(99),
-  cargo: "Engenheira Civil",
-  dataAdmissao: iso(addDays(today, -200)),
-  vencimentoPrimeiro: iso(addDays(today, -110)),
-  vencimentoSegundo: iso(addDays(today, -20)),
-  prorrogacaoAtual: 2,
-  encerrado: true,
-  motivoEncerramento: "Efetivado",
-});
 
 export const contratos: Contrato[] = contratosGen;
