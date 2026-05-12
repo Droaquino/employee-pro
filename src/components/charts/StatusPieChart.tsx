@@ -14,6 +14,9 @@ export function StatusPieChart({ contratos }: { contratos: Contrato[] }) {
     .filter(([, v]) => v > 0)
     .map(([k, v]) => ({ name: STATUS_LABEL[k], value: v, key: k }));
 
+  if (data.length === 0) {
+    return <div className="h-[300px] flex items-center justify-center text-[12px]" style={{ color: COLORS.textMuted }}>Sem dados para exibir</div>;
+  }
   return (
     <div>
       <ResponsiveContainer width="100%" height={300}>

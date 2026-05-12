@@ -27,6 +27,9 @@ export function EmpresasBarChart({ empresas, contratos }: { empresas: Empresa[];
     visible.push({ empresaId: "", nome: `(+ ${extras})`, total: 0, VIGENTE: 0, PROXIMO: 0, RISCO: 0, VENCIDO: 0 });
   }
 
+  if (visible.length === 0) {
+    return <div className="h-[300px] flex items-center justify-center text-[12px]" style={{ color: COLORS.textMuted }}>Sem dados para exibir</div>;
+  }
   return (
     <ResponsiveContainer width="100%" height={300}>
       <BarChart data={visible} layout="vertical" margin={{ left: 10, right: 16, top: 4, bottom: 4 }}>
