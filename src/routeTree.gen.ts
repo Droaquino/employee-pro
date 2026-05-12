@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as EmpresasRouteImport } from './routes/empresas'
+import { Route as EmRiscoRouteImport } from './routes/em-risco'
 import { Route as ContratosRouteImport } from './routes/contratos'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EmpresasIdRouteImport } from './routes/empresas.$id'
@@ -17,6 +18,11 @@ import { Route as EmpresasIdRouteImport } from './routes/empresas.$id'
 const EmpresasRoute = EmpresasRouteImport.update({
   id: '/empresas',
   path: '/empresas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmRiscoRoute = EmRiscoRouteImport.update({
+  id: '/em-risco',
+  path: '/em-risco',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContratosRoute = ContratosRouteImport.update({
@@ -38,12 +44,14 @@ const EmpresasIdRoute = EmpresasIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/contratos': typeof ContratosRoute
+  '/em-risco': typeof EmRiscoRoute
   '/empresas': typeof EmpresasRouteWithChildren
   '/empresas/$id': typeof EmpresasIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contratos': typeof ContratosRoute
+  '/em-risco': typeof EmRiscoRoute
   '/empresas': typeof EmpresasRouteWithChildren
   '/empresas/$id': typeof EmpresasIdRoute
 }
@@ -51,20 +59,28 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/contratos': typeof ContratosRoute
+  '/em-risco': typeof EmRiscoRoute
   '/empresas': typeof EmpresasRouteWithChildren
   '/empresas/$id': typeof EmpresasIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/contratos' | '/empresas' | '/empresas/$id'
+  fullPaths: '/' | '/contratos' | '/em-risco' | '/empresas' | '/empresas/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/contratos' | '/empresas' | '/empresas/$id'
-  id: '__root__' | '/' | '/contratos' | '/empresas' | '/empresas/$id'
+  to: '/' | '/contratos' | '/em-risco' | '/empresas' | '/empresas/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/contratos'
+    | '/em-risco'
+    | '/empresas'
+    | '/empresas/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ContratosRoute: typeof ContratosRoute
+  EmRiscoRoute: typeof EmRiscoRoute
   EmpresasRoute: typeof EmpresasRouteWithChildren
 }
 
@@ -75,6 +91,13 @@ declare module '@tanstack/react-router' {
       path: '/empresas'
       fullPath: '/empresas'
       preLoaderRoute: typeof EmpresasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/em-risco': {
+      id: '/em-risco'
+      path: '/em-risco'
+      fullPath: '/em-risco'
+      preLoaderRoute: typeof EmRiscoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contratos': {
@@ -116,6 +139,7 @@ const EmpresasRouteWithChildren = EmpresasRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ContratosRoute: ContratosRoute,
+  EmRiscoRoute: EmRiscoRoute,
   EmpresasRoute: EmpresasRouteWithChildren,
 }
 export const routeTree = rootRouteImport
