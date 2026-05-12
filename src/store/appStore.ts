@@ -7,6 +7,7 @@ type State = {
   upsertEmpresa: (e: Empresa) => void;
   removeEmpresa: (id: string) => void;
   toggleAtivo: (id: string) => void;
+  encerrarContratos: (ids: string[], motivo: string) => void;
 };
 
 export const useAppStore = create<State>((set) => ({
@@ -28,5 +29,9 @@ export const useAppStore = create<State>((set) => ({
   toggleAtivo: (id) =>
     set((s) => ({
       empresas: s.empresas.map((e) => (e.id === id ? { ...e, ativo: !e.ativo } : e)),
+    })),
+  encerrarContratos: (ids, motivo) =>
+    set((s) => ({
+      contratos: s.contratos.map((c) => (ids.includes(c.id) ? { ...c, encerrado: true, motivoEncerramento: motivo } : c)),
     })),
 }));

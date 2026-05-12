@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader, Surface } from "@/components/Surface";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { useAppStore } from "@/store/appStore";
 import { calcStatus } from "@/hooks/useStatusContrato";
 import { ContratosTable } from "@/components/ContratosTable";
@@ -21,6 +22,7 @@ function Proximos() {
 
   return (
     <div>
+      <Breadcrumb items={[{ label: "Alertas" }, { label: "Próximos vencimentos" }]} />
       <PageHeader
         title="Próximos vencimentos"
         subtitle={`${contratos.length} contrato(s) entre 16 e 30 dias do vencimento final.`}
