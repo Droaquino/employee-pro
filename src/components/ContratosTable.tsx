@@ -1,44 +1,101 @@
+import { useMemo, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { acaoRecomendada, calcStatus, maskCpf } from "@/hooks/useStatusContrato";
 import { STATUS_COLOR, STATUS_LABEL } from "@/constants/colors";
 import { formatDiasRestantes } from "@/lib/format";
+import { EmptyState } from "@/components/EmptyState";
 import type { Contrato } from "@/data/mock";
 
-export function ContratosTable({ contratos }: { contratos: Contrato[] }) {
-  const rows = contratos
-    .map((c) => ({ c, info: calcStatus(c) }))
-    .sort((a, b) => b.info.urgencia - a.info.urgencia);
+type SortKey = "funcionarioNome" | "cargo" | "dataAdmissao" | "vencimentoSegundo" | "diasRestantes" | "status";
+type SortDir = "asc" | "desc";
+
+type Props = {
+  contratos: Contrato[];
+  selectable?: boolean;
+  selected?: string[];
+  onSelectionChange?: (ids: string[]) => void;
+  onClearFilters?: () => void;
+  caption?: string;
+};
+
+export function ContratosTable({ contratos, selectable, selected = [], onSelectionChange, onClearFilters, caption }: Props) {
+  const [sortKey, setSortKey] = useState<SortKey>("diasRestantes");
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
+
+  const rows = useMemo(() => {
+    const enriched = contratos.map((c) => ({ c, info: calcStatus(c) }));
+    const dir = sortDir === "asc" ? 1 : -1;
+    enriched.sort((a, b) => {
+      const av: any = sortKey === "diasRestantes" ? a.info.diasRestantes : sortKey === "status" ? a.info.status : (a.c as any)[sortKey];
+      const bv: any = sortKey === "diasRestantes" ? b.info.diasRestantes : sortKey === "status" ? b.info.status : (b.c as any)[sortKey];
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
+    });
+    return enriched;
+  }, [contratos, sortKey, sortDir]);
+
+  if (rows.length === 0) {
+    return (
+      <EmptyState
+        icon="search"
+        title="Nenhum contrato encontrado"
+        subtitle="Ajuste os filtros ou limpe-os para ver outros contratos."
+        action={onClearFilters ? (
+          <button onClick={onClearFilters} className="text-[12px] px-3 py-1.5 rounded-md text-white" style={{ background: "#071040" }}>
+            Limpar filtros
+          </button>
+        ) : undefined}
+      />
+    );
+  }
+
+  const allIds = rows.map((r) => r.c.id);
+  const allSelected = selectable && selected.length > 0 && selected.length === allIds.length;
+  const toggleAll = () => onSelectionChange?.(allSelected ? [] : allIds);
+  const toggleOne = (id: string) => onSelectionChange?.(selected.includes(id) ? selected.filter((x) => x !== id) : [...selected, id]);
+
+  const headerSort = (key: SortKey) => {
+    if (sortKey === key) setSortDir(sortDir === "asc" ? "desc" : "asc");
+    else { setSortKey(key); setSortDir("asc"); }
+  };
 
   return (
     <div className="overflow-x-auto">
-      <table className="text-[12px]">
+      <table className="text-[12px] w-full" aria-label={caption ?? "Lista de contratos"}>
+        {caption && <caption className="sr-only">{caption}</caption>}
         <thead>
           <tr style={{ color: "#64748b", textAlign: "left" }}>
-            <Th>Funcionário</Th>
+            {selectable && (
+              <Th>
+                <input type="checkbox" aria-label="Selecionar todos" checked={!!allSelected} onChange={toggleAll} />
+              </Th>
+            )}
+            <SortableTh label="Funcionário" k="funcionarioNome" sortKey={sortKey} sortDir={sortDir} onClick={headerSort} />
             <Th>CPF</Th>
-            <Th>Cargo</Th>
-            <Th>Admissão</Th>
-            <Th>Vencimento 1ª</Th>
-            <Th>Vencimento 2ª</Th>
-            <Th>Status</Th>
-            <Th>Dias restantes</Th>
+            <SortableTh label="Cargo" k="cargo" sortKey={sortKey} sortDir={sortDir} onClick={headerSort} />
+            <SortableTh label="Admissão" k="dataAdmissao" sortKey={sortKey} sortDir={sortDir} onClick={headerSort} />
+            <SortableTh label="Vencimento 2ª" k="vencimentoSegundo" sortKey={sortKey} sortDir={sortDir} onClick={headerSort} />
+            <SortableTh label="Status" k="status" sortKey={sortKey} sortDir={sortDir} onClick={headerSort} />
+            <SortableTh label="Dias restantes" k="diasRestantes" sortKey={sortKey} sortDir={sortDir} onClick={headerSort} />
             <Th>Ação recomendada</Th>
           </tr>
         </thead>
         <tbody>
           {rows.map(({ c, info }) => (
-            <tr key={c.id} style={{ borderTop: "1px solid #e2e5f0" }}>
+            <tr key={c.id} style={{ borderTop: "1px solid #e2e5f0", background: selected.includes(c.id) ? "#f0f5ff" : undefined }}>
+              {selectable && (
+                <Td>
+                  <input type="checkbox" aria-label={`Selecionar ${c.funcionarioNome}`} checked={selected.includes(c.id)} onChange={() => toggleOne(c.id)} />
+                </Td>
+              )}
               <Td>{c.funcionarioNome}</Td>
               <Td>{maskCpf(c.funcionarioCpf)}</Td>
               <Td>{c.cargo}</Td>
               <Td>{format(parseISO(c.dataAdmissao), "dd/MM/yyyy")}</Td>
-              <Td>{format(parseISO(c.vencimentoPrimeiro), "dd/MM/yyyy")}</Td>
               <Td>{format(parseISO(c.vencimentoSegundo), "dd/MM/yyyy")}</Td>
               <Td>
-                <span
-                  className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium"
-                  style={{ background: STATUS_COLOR[info.status] + "22", color: STATUS_COLOR[info.status] }}
-                >
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium" style={{ background: STATUS_COLOR[info.status] + "22", color: STATUS_COLOR[info.status] }}>
                   <span className="w-1.5 h-1.5 rounded-full" style={{ background: STATUS_COLOR[info.status] }} />
                   {STATUS_LABEL[info.status]}
                 </span>
@@ -50,15 +107,12 @@ export function ContratosTable({ contratos }: { contratos: Contrato[] }) {
                 })()}
               </Td>
               <Td>
-                <span style={{ color: info.status === "VENCIDO" ? STATUS_COLOR.VENCIDO : info.status === "RISCO" ? STATUS_COLOR.risco : "#0f172a", fontWeight: info.status === "VENCIDO" || info.status === "RISCO" ? 600 : 400 }}>
+                <span style={{ color: info.status === "VENCIDO" ? STATUS_COLOR.VENCIDO : info.status === "RISCO" ? STATUS_COLOR.RISCO : "#0f172a", fontWeight: info.status === "VENCIDO" || info.status === "RISCO" ? 600 : 400 }}>
                   {acaoRecomendada(info, c)}
                 </span>
               </Td>
             </tr>
           ))}
-          {rows.length === 0 && (
-            <tr><td colSpan={9} className="py-6 text-center" style={{ color: "#64748b" }}>Nenhum contrato.</td></tr>
-          )}
         </tbody>
       </table>
     </div>
@@ -67,6 +121,17 @@ export function ContratosTable({ contratos }: { contratos: Contrato[] }) {
 
 function Th({ children }: { children: React.ReactNode }) {
   return <th className="py-2 px-3 font-medium uppercase text-[10px] tracking-wider">{children}</th>;
+}
+function SortableTh({ label, k, sortKey, sortDir, onClick }: { label: string; k: SortKey; sortKey: SortKey; sortDir: SortDir; onClick: (k: SortKey) => void }) {
+  const active = sortKey === k;
+  return (
+    <th className="py-2 px-3 font-medium uppercase text-[10px] tracking-wider">
+      <button onClick={() => onClick(k)} className="inline-flex items-center gap-1 hover:underline" aria-label={`Ordenar por ${label}`}>
+        {label}
+        <span style={{ opacity: active ? 1 : 0.3, fontSize: 9 }}>{active && sortDir === "desc" ? "▼" : "▲"}</span>
+      </button>
+    </th>
+  );
 }
 function Td({ children }: { children: React.ReactNode }) {
   return <td className="py-2.5 px-3 align-middle">{children}</td>;
