@@ -105,13 +105,14 @@ export function EmpresaForm({ open, initial, onClose, onSave }: Props) {
   );
 }
 
-const input = "w-full px-3 py-2 rounded-md border text-[13px] outline-none focus:border-[#4f8ef7]";
+const input = "w-full px-3 py-2 rounded-md text-[13px] outline-none bg-white";
+const inputStyle = (err?: boolean): React.CSSProperties => ({ border: `1px solid ${err ? "#ef4444" : "#e2e5f0"}` });
 
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div>
       <label className="block text-[12px] font-medium mb-1.5" style={{ color: "#0f172a" }}>{label}</label>
-      <div style={{ borderColor: error ? "#ef4444" : "#e2e5f0" }} className="[&>*]:border-current rounded-md">
+      <div style={inputStyle(!!error)} className="rounded-md">
         {children}
       </div>
       {error && <p className="text-[11px] mt-1" style={{ color: "#ef4444" }}>{error}</p>}
