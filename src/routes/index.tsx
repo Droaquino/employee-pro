@@ -1,26 +1,45 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { PageHeader, Surface } from "@/components/Surface";
+import { StatusPieChart } from "@/components/charts/StatusPieChart";
+import { EmpresasBarChart } from "@/components/charts/EmpresasBarChart";
+import { VencimentosBarChart } from "@/components/charts/VencimentosBarChart";
+import { EvolucaoLineChart } from "@/components/charts/EvolucaoLineChart";
+import { useAppStore } from "@/store/appStore";
 
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Dashboard — Experiência" },
+      { name: "description", content: "Visão consolidada dos contratos de experiência da carteira." },
+    ],
+  }),
+  component: Dashboard,
 });
 
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
+function Dashboard() {
+  const empresas = useAppStore((s) => s.empresas);
+  const contratos = useAppStore((s) => s.contratos);
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
+    <div>
+      <PageHeader
+        title="Dashboard geral"
+        subtitle="Visão consolidada da carteira de contratos de experiência."
       />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Surface title="Distribuição por status">
+          <StatusPieChart contratos={contratos} />
+        </Surface>
+        <Surface title="Contratos por empresa">
+          <EmpresasBarChart empresas={empresas} contratos={contratos} />
+        </Surface>
+        <Surface title="Vencimentos por mês">
+          <VencimentosBarChart contratos={contratos} />
+        </Surface>
+        <Surface title="Evolução da carteira">
+          <EvolucaoLineChart contratos={contratos} />
+        </Surface>
+      </div>
     </div>
   );
-}
-
-function Index() {
-  return <PlaceholderIndex />;
 }
