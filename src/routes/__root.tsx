@@ -49,8 +49,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Experiência — Gestão de contratos" },
-      { name: "description", content: "Sistema de gestão de contratos de experiência trabalhista." },
+      { title: "Arbrent — Gestão de contratos de experiência" },
+      { name: "description", content: "Sistema Arbrent Contabilidade para gestão de contratos de experiência trabalhista." },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),

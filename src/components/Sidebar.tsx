@@ -2,6 +2,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useAppStore } from "@/store/appStore";
 import { calcStatus } from "@/hooks/useStatusContrato";
+import logo from "@/assets/arbrent-logo.png";
 
 type Item = {
   to: string;
@@ -46,13 +47,13 @@ export function Sidebar() {
       className="fixed inset-y-0 left-0 w-[240px] flex flex-col h-screen overflow-y-auto"
     >
       <div className="px-5 pt-6 pb-8">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-md flex items-center justify-center" style={{ background: "#4f8ef7" }}>
-            <span className="font-semibold text-white text-sm">EX</span>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-md flex items-center justify-center bg-white p-1.5">
+            <img src={logo} alt="Arbrent" className="w-full h-full object-contain" />
           </div>
           <div>
-            <div className="text-[15px] font-semibold tracking-tight">Experiência</div>
-            <div className="text-[11px]" style={{ color: "#a8b3e8" }}>Gestão de contratos</div>
+            <div className="text-[15px] font-semibold tracking-tight">Arbrent</div>
+            <div className="text-[11px]" style={{ color: "#a8b3e8" }}>Contabilidade · Experiência</div>
           </div>
         </div>
       </div>
