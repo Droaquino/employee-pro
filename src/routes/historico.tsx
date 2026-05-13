@@ -34,7 +34,7 @@ function HistoricoPage() {
       <PageHeader title="Histórico de ações" subtitle="Registro das alterações realizadas durante esta sessão." />
       <Surface>
         {historico.length === 0 ? (
-          <EmptyState icon="empty" title="Nenhuma ação registrada" subtitle="Ações realizadas no sistema aparecerão aqui." />
+          <EmptyState icon="inbox" title="Nenhuma ação registrada" subtitle="Ações realizadas no sistema aparecerão aqui." />
         ) : (
           <ul className="divide-y" style={{ borderColor: "#e2e5f0" }}>
             {historico.map((ev) => {
