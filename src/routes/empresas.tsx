@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { PageHeader, Surface } from "@/components/Surface";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { EmptyState } from "@/components/EmptyState";
@@ -7,6 +8,7 @@ import { useAppStore } from "@/store/appStore";
 import { EmpresaForm } from "@/components/EmpresaForm";
 import type { Empresa } from "@/data/mock";
 import { responsaveis } from "@/data/mock";
+import { csvDateStamp, downloadCsv, toCsv } from "@/lib/csv";
 
 export const Route = createFileRoute("/empresas")({
   head: () => ({
@@ -44,6 +46,22 @@ function EmpresasPage() {
     return m;
   }, [contratos]);
 
+  const handleExport = () => {
+    if (filtered.length === 0) { toast.error("Nada para exportar"); return; }
+    const rows = filtered.map((e) => ({
+      "Razao Social": e.razaoSocial,
+      "Nome Fantasia": e.nomeFantasia,
+      CNPJ: e.cnpj,
+      Responsavel: respMap.get(e.responsavelId) ?? "",
+      Email: e.email,
+      Telefone: e.telefone,
+      "Contratos Ativos": ativosPorEmpresa.get(e.id) ?? 0,
+      Status: e.ativo ? "Ativa" : "Inativa",
+    }));
+    downloadCsv(`empresas_${csvDateStamp()}.csv`, toCsv(rows));
+    toast.success(`${rows.length} empresa(s) exportada(s)`);
+  };
+
   return (
     <div>
       <Breadcrumb items={[{ label: "Gestão" }, { label: "Empresas" }]} />
@@ -51,13 +69,22 @@ function EmpresasPage() {
         title="Empresas"
         subtitle="Carteira de empresas clientes e seus contratos ativos."
         right={
-          <button
-            onClick={() => { setEditing(null); setOpen(true); }}
-            className="px-4 py-2 rounded-md text-[13px] font-medium text-white"
-            style={{ background: "#071040" }}
-          >
-            + Nova empresa
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleExport}
+              className="px-4 py-2 rounded-md text-[13px] font-medium"
+              style={{ background: "#fff", color: "#071040", border: "1px solid #071040" }}
+            >
+              Exportar CSV
+            </button>
+            <button
+              onClick={() => { setEditing(null); setOpen(true); }}
+              className="px-4 py-2 rounded-md text-[13px] font-medium text-white"
+              style={{ background: "#071040" }}
+            >
+              + Nova empresa
+            </button>
+          </div>
         }
       />
 
