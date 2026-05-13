@@ -1,10 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { format, parseISO } from "date-fns";
+import { toast } from "sonner";
 import { PageHeader, Surface } from "@/components/Surface";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { useAppStore } from "@/store/appStore";
 import { ContratosTable } from "@/components/ContratosTable";
 import { ContratosFilters, applyFilters, initialFilters, type FiltersState } from "@/components/ContratosFilters";
+import { calcStatus } from "@/hooks/useStatusContrato";
+import { STATUS_LABEL } from "@/constants/colors";
+import { csvDateStamp, downloadCsv, toCsv } from "@/lib/csv";
 
 export const Route = createFileRoute("/contratos")({
   head: () => ({
