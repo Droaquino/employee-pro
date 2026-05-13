@@ -9,6 +9,7 @@ import {
 
 import appCss from "../styles.css?url";
 import { Sidebar } from "@/components/Sidebar";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -78,6 +79,7 @@ function RootComponent() {
         <main style={{ marginLeft: 240, padding: 24 }}>
           <Outlet />
         </main>
+        <Toaster richColors position="top-right" />
       </div>
     </QueryClientProvider>
   );
