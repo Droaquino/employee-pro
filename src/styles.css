@@ -38,3 +38,11 @@ table {
   border-collapse: collapse;
   width: 100%;
 }
+
+@keyframes arbrent-shake {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  20% { transform: translateX(-2px) rotate(-8deg); }
+  40% { transform: translateX(2px) rotate(8deg); }
+  60% { transform: translateX(-2px) rotate(-6deg); }
+  80% { transform: translateX(2px) rotate(6deg); }
+}

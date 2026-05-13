@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { PageHeader, Surface } from "@/components/Surface";
@@ -8,6 +8,7 @@ import { VencimentosBarChart } from "@/components/charts/VencimentosBarChart";
 import { EvolucaoLineChart } from "@/components/charts/EvolucaoLineChart";
 import { useAppStore } from "@/store/appStore";
 import { calcStatus } from "@/hooks/useStatusContrato";
+import { BannerAlerta } from "@/components/BannerAlerta";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -50,19 +51,7 @@ function Dashboard() {
         title="Dashboard geral"
         subtitle="Visão consolidada da carteira de contratos de experiência."
       />
-      {(counts.risco + counts.vencido) > 0 && (
-        <div className="mb-4 flex items-center gap-3 px-4 py-3 rounded-md" style={{ background: "#fef2f2", border: "1px solid #fecaca" }}>
-          <span className="w-2 h-2 rounded-full" style={{ background: "#ef4444" }} />
-          <div className="flex-1 text-[13px]" style={{ color: "#7f1d1d" }}>
-            <strong>{counts.vencido + counts.risco}</strong> contrato(s) precisam de ação imediata
-            {" · "}<span style={{ color: "#991b1b" }}>{counts.vencido} vencido(s)</span>
-            {" · "}<span style={{ color: "#b45309" }}>{counts.risco} em risco</span>
-          </div>
-          <Link to="/em-risco" className="text-[12px] font-medium px-3 py-1.5 rounded-md text-white" style={{ background: "#ef4444" }}>
-            Ver agora
-          </Link>
-        </div>
-      )}
+      <BannerAlerta />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Surface title="Distribuição por status">
           <StatusPieChart contratos={contratos} />
