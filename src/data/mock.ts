@@ -66,7 +66,7 @@ const buckets: Bucket[] = [
   { count: 15, minDays: 31, maxDays: 90 },   // vigentes
   { count: 20, minDays: 16, maxDays: 30 },   // próximos
   { count: 15, minDays: 1, maxDays: 15 },    // risco
-  { count: 6, minDays: -30, maxDays: -1 },   // vencidos
+  { count: 6, minDays: -20, maxDays: -1 },   // vencidos (máx. 20 dias)
   { count: 5, minDays: -120, maxDays: -40, encerrado: true }, // encerrados
 ];
 
