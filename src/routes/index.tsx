@@ -21,34 +21,13 @@ function Dashboard() {
   const empresas = useAppStore((s) => s.empresas);
   const contratos = useAppStore((s) => s.contratos);
 
-  const counts = useMemo(() => {
-    let risco = 0, vencido = 0;
-    for (const c of contratos) {
-      if (c.encerrado) continue;
-      const { status } = calcStatus(c);
-      if (status === "RISCO") risco++;
-      else if (status === "VENCIDO") vencido++;
-    }
-    return { risco, vencido };
-  }, [contratos]);
-
-  useEffect(() => {
-    const total = counts.risco + counts.vencido;
-    if (total === 0) return;
-    toast.warning(`${total} contrato(s) precisam de atenção`, {
-      description: `${counts.vencido} vencido(s) · ${counts.risco} em risco (≤ 15 dias).`,
-      duration: 6000,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <div>
       <PageHeader
         title="Dashboard geral"
         subtitle="Visão consolidada da carteira de contratos de experiência."
       />
-      <BannerAlerta />
+      <PainelAcaoDia />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Surface title="Distribuição por status">
           <StatusPieChart contratos={contratos} />
