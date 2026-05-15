@@ -1,14 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo } from "react";
-import { toast } from "sonner";
 import { PageHeader, Surface } from "@/components/Surface";
 import { StatusPieChart } from "@/components/charts/StatusPieChart";
 import { EmpresasBarChart } from "@/components/charts/EmpresasBarChart";
 import { VencimentosBarChart } from "@/components/charts/VencimentosBarChart";
 import { EvolucaoLineChart } from "@/components/charts/EvolucaoLineChart";
 import { useAppStore } from "@/store/appStore";
-import { calcStatus } from "@/hooks/useStatusContrato";
-import { BannerAlerta } from "@/components/BannerAlerta";
+import { PainelAcaoDia } from "@/components/PainelAcaoDia";
 
 export const Route = createFileRoute("/")({
   head: () => ({
