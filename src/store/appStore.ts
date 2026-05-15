@@ -1,5 +1,8 @@
 import { create } from "zustand";
-import { empresas as seedEmpresas, contratos as seedContratos, type Empresa, type Contrato } from "@/data/mock";
+import { empresas as seedEmpresas, type Empresa, type Contrato } from "@/data/mock";
+import { dadosFixos } from "@/data/dadosFixos";
+
+const seedContratos: Contrato[] = dadosFixos.contratos;
 
 export type HistoryEvent = {
   id: string;

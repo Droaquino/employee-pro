@@ -1,0 +1,26 @@
+import type { Contrato } from "@/data/mock";
+
+export const dadosFixos = {
+  contratos: [
+    { id: "c01", empresaId: "e1", funcionarioNome: "Ana Lima", funcionarioCpf: "111.111.111-01", cargo: "Vendedora", dataAdmissao: "2026-02-14", vencimentoPrimeiro: "2026-05-15", vencimentoSegundo: "2026-08-13", prorrogacaoAtual: 2, encerrado: false },
+    { id: "c02", empresaId: "e1", funcionarioNome: "Carlos Melo", funcionarioCpf: "111.111.111-02", cargo: "Assistente", dataAdmissao: "2026-02-20", vencimentoPrimeiro: "2026-05-21", vencimentoSegundo: "2026-08-19", prorrogacaoAtual: 2, encerrado: false },
+    { id: "c03", empresaId: "e2", funcionarioNome: "Fernanda Cruz", funcionarioCpf: "111.111.111-03", cargo: "Operadora", dataAdmissao: "2026-02-10", vencimentoPrimeiro: "2026-05-11", vencimentoSegundo: "2026-08-09", prorrogacaoAtual: 2, encerrado: false },
+    { id: "c04", empresaId: "e2", funcionarioNome: "Rafael Souza", funcionarioCpf: "111.111.111-04", cargo: "Motorista", dataAdmissao: "2026-01-15", vencimentoPrimeiro: "2026-04-15", vencimentoSegundo: "2026-07-14", prorrogacaoAtual: 2, encerrado: false },
+    { id: "c05", empresaId: "e3", funcionarioNome: "Juliana Barros", funcionarioCpf: "111.111.111-05", cargo: "Caixa", dataAdmissao: "2026-01-20", vencimentoPrimeiro: "2026-04-20", vencimentoSegundo: "2026-07-19", prorrogacaoAtual: 2, encerrado: false },
+    { id: "c06", empresaId: "e3", funcionarioNome: "Marcos Dias", funcionarioCpf: "111.111.111-06", cargo: "Estoquista", dataAdmissao: "2026-01-25", vencimentoPrimeiro: "2026-04-25", vencimentoSegundo: "2026-07-24", prorrogacaoAtual: 2, encerrado: false },
+    { id: "c07", empresaId: "e4", funcionarioNome: "Patricia Nunes", funcionarioCpf: "111.111.111-07", cargo: "Analista", dataAdmissao: "2026-02-01", vencimentoPrimeiro: "2026-05-02", vencimentoSegundo: "2026-07-31", prorrogacaoAtual: 2, encerrado: false },
+    { id: "c08", empresaId: "e4", funcionarioNome: "Diego Costa", funcionarioCpf: "111.111.111-08", cargo: "Desenvolvedor", dataAdmissao: "2026-02-05", vencimentoPrimeiro: "2026-05-06", vencimentoSegundo: "2026-08-04", prorrogacaoAtual: 2, encerrado: false },
+    { id: "c09", empresaId: "e5", funcionarioNome: "Larissa Pinto", funcionarioCpf: "111.111.111-09", cargo: "Vendedora", dataAdmissao: "2026-01-10", vencimentoPrimeiro: "2026-04-10", vencimentoSegundo: "2026-07-09", prorrogacaoAtual: 2, encerrado: false },
+    { id: "c10", empresaId: "e5", funcionarioNome: "Bruno Alves", funcionarioCpf: "111.111.111-10", cargo: "Repositor", dataAdmissao: "2026-01-05", vencimentoPrimeiro: "2026-04-05", vencimentoSegundo: "2026-07-04", prorrogacaoAtual: 2, encerrado: false },
+    { id: "c11", empresaId: "e1", funcionarioNome: "Sofia Ramos", funcionarioCpf: "111.111.111-11", cargo: "Recepcionista", dataAdmissao: "2025-12-03", vencimentoPrimeiro: "2026-03-03", vencimentoSegundo: "2026-06-01", prorrogacaoAtual: 2, encerrado: false },
+    { id: "c12", empresaId: "e1", funcionarioNome: "Thiago Mendes", funcionarioCpf: "111.111.111-12", cargo: "Técnico", dataAdmissao: "2025-12-07", vencimentoPrimeiro: "2026-03-07", vencimentoSegundo: "2026-06-05", prorrogacaoAtual: 2, encerrado: false },
+    { id: "c13", empresaId: "e2", funcionarioNome: "Natália Gomes", funcionarioCpf: "111.111.111-13", cargo: "Atendente", dataAdmissao: "2025-12-10", vencimentoPrimeiro: "2026-03-10", vencimentoSegundo: "2026-06-08", prorrogacaoAtual: 2, encerrado: false },
+    { id: "c14", empresaId: "e2", funcionarioNome: "Eduardo Reis", funcionarioCpf: "111.111.111-14", cargo: "Ajudante", dataAdmissao: "2025-12-14", vencimentoPrimeiro: "2026-03-14", vencimentoSegundo: "2026-06-12", prorrogacaoAtual: 2, encerrado: false },
+    { id: "c15", empresaId: "e3", funcionarioNome: "Camila Torres", funcionarioCpf: "111.111.111-15", cargo: "Caixa", dataAdmissao: "2025-12-01", vencimentoPrimeiro: "2026-03-01", vencimentoSegundo: "2026-05-30", prorrogacaoAtual: 2, encerrado: false },
+    { id: "c16", empresaId: "e3", funcionarioNome: "Gustavo Lima", funcionarioCpf: "111.111.111-16", cargo: "Vendedor", dataAdmissao: "2025-12-05", vencimentoPrimeiro: "2026-03-05", vencimentoSegundo: "2026-06-03", prorrogacaoAtual: 2, encerrado: false },
+    { id: "c17", empresaId: "e4", funcionarioNome: "Helena Freitas", funcionarioCpf: "111.111.111-17", cargo: "Suporte", dataAdmissao: "2025-12-12", vencimentoPrimeiro: "2026-03-12", vencimentoSegundo: "2026-06-10", prorrogacaoAtual: 2, encerrado: false },
+    { id: "c18", empresaId: "e5", funcionarioNome: "Igor Cardoso", funcionarioCpf: "111.111.111-18", cargo: "Repositor", dataAdmissao: "2025-12-08", vencimentoPrimeiro: "2026-03-08", vencimentoSegundo: "2026-06-06", prorrogacaoAtual: 2, encerrado: false },
+    { id: "c19", empresaId: "e1", funcionarioNome: "Beatriz Lopes", funcionarioCpf: "111.111.111-19", cargo: "Vendedora", dataAdmissao: "2025-11-17", vencimentoPrimeiro: "2026-02-15", vencimentoSegundo: "2026-05-22", prorrogacaoAtual: 2, encerrado: false },
+    { id: "c20", empresaId: "e2", funcionarioNome: "Caio Moraes", funcionarioCpf: "111.111.111-20", cargo: "Assistente", dataAdmissao: "2025-11-20", vencimentoPrimeiro: "2026-02-18", vencimentoSegundo: "2026-05-24", prorrogacaoAtual: 2, encerrado: false },
+  ] satisfies Contrato[],
+};
