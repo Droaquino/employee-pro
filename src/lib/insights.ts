@@ -85,3 +85,37 @@ export function insightEvolucao(contratos: Contrato[]): Insight {
     texto: `${em60} de ${ativos} contratos (${pct}%) vencem nos próximos 60 dias.`,
   };
 }
+
+export function insightHeatmap(empresas: Empresa[], contratos: Contrato[]): Insight {
+  const now = new Date();
+  const limit = new Date(now.getTime() + 84 * 86400000); // 12 semanas
+  const ativos = contratos.filter((c) => !c.encerrado);
+  const noPeriodo = ativos.filter((c) => {
+    const v = parseISO(c.vencimentoSegundo);
+    return v >= now && v <= limit;
+  });
+  if (noPeriodo.length === 0) return { tone: "ok", texto: "Sem vencimentos nas próximas 12 semanas." };
+
+  // semana com mais vencimentos por empresa
+  const porSemanaEmpresa = new Map<string, number>();
+  for (const c of noPeriodo) {
+    const v = parseISO(c.vencimentoSegundo);
+    const semanaIdx = Math.floor((v.getTime() - now.getTime()) / (7 * 86400000));
+    const key = `${c.empresaId}|${semanaIdx}`;
+    porSemanaEmpresa.set(key, (porSemanaEmpresa.get(key) ?? 0) + 1);
+  }
+  let topKey = "";
+  let topCount = 0;
+  for (const [k, v] of porSemanaEmpresa) if (v > topCount) { topCount = v; topKey = k; }
+  if (topCount <= 1) {
+    return { tone: "neutro", texto: `${noPeriodo.length} vencimento(s) distribuídos nas próximas 12 semanas — sem concentração relevante.` };
+  }
+  const [eid, sIdx] = topKey.split("|");
+  const emp = empresas.find((e) => e.id === eid)?.nomeFantasia ?? "Empresa";
+  const semanaInicio = new Date(now.getTime() + Number(sIdx) * 7 * 86400000);
+  const tone = topCount >= 5 ? "critico" : topCount >= 3 ? "atencao" : "neutro";
+  return {
+    tone,
+    texto: `Pico: ${topCount} contratos da ${emp} vencem na semana de ${format(semanaInicio, "dd/MM", { locale: ptBR })}.`,
+  };
+}

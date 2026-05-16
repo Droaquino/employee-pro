@@ -4,10 +4,11 @@ import { StatusPieChart } from "@/components/charts/StatusPieChart";
 import { EmpresasBarChart } from "@/components/charts/EmpresasBarChart";
 import { VencimentosBarChart } from "@/components/charts/VencimentosBarChart";
 import { EvolucaoLineChart } from "@/components/charts/EvolucaoLineChart";
+import { HeatmapVencimentos } from "@/components/charts/HeatmapVencimentos";
 import { useAppStore } from "@/store/appStore";
 import { PainelAcaoDia } from "@/components/PainelAcaoDia";
 import { ChartInsight } from "@/components/ChartInsight";
-import { insightStatus, insightEmpresas, insightVencimentos, insightEvolucao } from "@/lib/insights";
+import { insightStatus, insightEmpresas, insightVencimentos, insightEvolucao, insightHeatmap } from "@/lib/insights";
 import { useMemo } from "react";
 
 export const Route = createFileRoute("/")({
@@ -28,6 +29,7 @@ function Dashboard() {
   const iEmpresas = useMemo(() => insightEmpresas(empresas, contratos), [empresas, contratos]);
   const iVenc = useMemo(() => insightVencimentos(contratos), [contratos]);
   const iEvol = useMemo(() => insightEvolucao(contratos), [contratos]);
+  const iHeat = useMemo(() => insightHeatmap(empresas, contratos), [empresas, contratos]);
 
   return (
     <div>
@@ -52,6 +54,10 @@ function Dashboard() {
         <Surface title="Evolução da carteira">
           <EvolucaoLineChart contratos={contratos} />
           <ChartInsight insight={iEvol} />
+        </Surface>
+        <Surface title="Mapa de calor — vencimentos por semana (próximos 3 meses)" className="lg:col-span-2">
+          <HeatmapVencimentos />
+          <ChartInsight insight={iHeat} />
         </Surface>
       </div>
     </div>
