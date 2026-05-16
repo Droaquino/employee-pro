@@ -64,7 +64,7 @@ export function HeatmapVencimentos() {
 
   const handleCellClick = (cell: Cell) => {
     if (cell.count === 0) return;
-    navigate({ to: "/contratos", search: { empresaId: cell.empresaId } as never });
+    navigate({ to: "/empresas/$id", params: { id: cell.empresaId } });
   };
 
   // Group weeks by month for header
