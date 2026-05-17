@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { differenceInCalendarDays, parseISO, startOfDay } from "date-fns";
 import { useAppStore } from "@/store/appStore";
 import { useNotificacoes } from "@/hooks/useNotificacoes";
