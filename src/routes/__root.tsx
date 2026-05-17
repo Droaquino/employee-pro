@@ -10,6 +10,7 @@ import {
 import appCss from "../styles.css?url";
 import { Sidebar } from "@/components/Sidebar";
 import { Toaster } from "@/components/ui/sonner";
+import { CalculadoraPrazo } from "@/components/CalculadoraPrazo";
 
 function NotFoundComponent() {
   return (
