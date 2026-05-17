@@ -126,8 +126,8 @@ export function Sidebar() {
                       <span className="flex-1">{it.label}</span>
                       {badge > 0 && (
                         <span
-                          className="text-[11px] font-semibold text-white"
-                          style={{ marginLeft: 8, padding: "2px 6px", borderRadius: 10, background: badgeColor }}
+                          className="text-[11px] font-semibold text-white leading-none"
+                          style={{ marginLeft: 8, padding: "2px 7px", borderRadius: 10, background: badgeColor }}
                         >
                           {badge}
                         </span>
