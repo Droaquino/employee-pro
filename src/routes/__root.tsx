@@ -81,6 +81,7 @@ function RootComponent() {
           <Outlet />
         </main>
         <Toaster richColors position="top-right" />
+        <CalculadoraPrazo />
       </div>
     </QueryClientProvider>
   );
