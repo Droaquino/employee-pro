@@ -95,7 +95,7 @@ export function useNotificacoes() {
           descricao: `Venceu há ${Math.abs(dias)} dia(s) e não foi regularizado. ${empNome}`,
           empresaId: c.empresaId,
           contratoId: c.id,
-          criadaEm: hoje,
+          criadaEm: agora,
           rota: rotaContrato,
           rotaLabel: "Ver contrato",
         });
@@ -108,7 +108,7 @@ export function useNotificacoes() {
           descricao: `${empNome} · ${c.cargo} · 2ª prorrogação`,
           empresaId: c.empresaId,
           contratoId: c.id,
-          criadaEm: hoje,
+          criadaEm: agora,
           rota: rotaContrato,
           rotaLabel: "Ver contrato",
         });
@@ -121,7 +121,7 @@ export function useNotificacoes() {
           descricao: `Agende avaliação. ${empNome} · ${c.cargo}`,
           empresaId: c.empresaId,
           contratoId: c.id,
-          criadaEm: hoje,
+          criadaEm: agora,
           rota: rotaContrato,
           rotaLabel: "Ver contrato",
         });
@@ -134,7 +134,7 @@ export function useNotificacoes() {
           descricao: `Defina se será efetivado ou encerrado. ${empNome}`,
           empresaId: c.empresaId,
           contratoId: c.id,
-          criadaEm: hoje,
+          criadaEm: agora,
           rota: rotaContrato,
           rotaLabel: "Ver contrato",
         });
@@ -156,7 +156,7 @@ export function useNotificacoes() {
         descricao: "Ação imediata necessária para evitar passivo trabalhista",
         empresaId: empId,
         contratoId: null,
-        criadaEm: hoje,
+        criadaEm: agora,
         rota: `/empresas/${empId}`,
         rotaLabel: "Ver empresa",
       });
@@ -174,7 +174,7 @@ export function useNotificacoes() {
         descricao: "Planeje as avaliações com antecedência",
         empresaId: empId,
         contratoId: null,
-        criadaEm: hoje,
+        criadaEm: agora,
         rota: `/empresas/${empId}`,
         rotaLabel: "Ver empresa",
       });
@@ -198,7 +198,7 @@ export function useNotificacoes() {
       descricao: `${risco} em risco · ${proximo} próximos do vencimento · ${vencido} vencidos`,
       empresaId: null,
       contratoId: null,
-      criadaEm: hoje,
+      criadaEm: agora,
       rota: "/",
       rotaLabel: "Ver dashboard",
     });
