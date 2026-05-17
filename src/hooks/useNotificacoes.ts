@@ -62,6 +62,7 @@ export function useNotificacoes() {
 
   const notificacoes = useMemo<Notificacao[]>(() => {
     const hoje = startOfDay(new Date());
+    const agora = new Date();
     const lidas = new Set(stored.lidas);
     const list: Notificacao[] = [];
     const seen = new Set<string>();
