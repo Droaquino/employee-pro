@@ -48,8 +48,11 @@ export function Sidebar() {
   const { naoLidas, naoLidasPorTipo } = useNotificacoes();
   const [painelOpen, setPainelOpen] = useState(false);
   const sinoRef = useRef<HTMLButtonElement | null>(null);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const counts = useMemo(() => {
+    if (!mounted) return { risco: 0, proximo: 0 };
     const hoje = startOfDay(new Date());
     let risco = 0, proximo = 0;
     for (const c of contratos) {
@@ -59,7 +62,7 @@ export function Sidebar() {
       else if (dias <= 30) proximo++;
     }
     return { risco, proximo };
-  }, [contratos]);
+  }, [contratos, mounted]);
 
   return (
     <>
