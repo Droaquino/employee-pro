@@ -10,6 +10,7 @@ import {
 import appCss from "../styles.css?url";
 import { Sidebar } from "@/components/Sidebar";
 import { Toaster } from "@/components/ui/sonner";
+import { CalculadoraPrazo } from "@/components/CalculadoraPrazo";
 
 function NotFoundComponent() {
   return (
@@ -80,6 +81,7 @@ function RootComponent() {
           <Outlet />
         </main>
         <Toaster richColors position="top-right" />
+        <CalculadoraPrazo />
       </div>
     </QueryClientProvider>
   );
