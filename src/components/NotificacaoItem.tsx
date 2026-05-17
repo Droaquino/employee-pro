@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { format, isToday, isYesterday, isThisWeek } from "date-fns";
+import { useEffect, useState } from "react";
+import { differenceInCalendarDays, format, formatDistanceToNow, isToday } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { Notificacao, TipoNotif } from "@/hooks/useNotificacoes";
 import { COLORS } from "@/constants/colors";
@@ -21,16 +22,21 @@ type Props = {
   onClick: (n: Notificacao) => void;
 };
 
+function formatRelativo(data: Date) {
+  if (isToday(data)) {
+    // formatDistanceToNow já retorna em pt-BR algo como "há 5 minutos"
+    return formatDistanceToNow(data, { addSuffix: true, locale: ptBR });
+  }
+  const dias = differenceInCalendarDays(new Date(), data);
+  if (dias === 1) return "ontem";
+  return format(data, "dd/MM", { locale: ptBR });
+}
+
 export function NotificacaoItem({ n, onClick }: Props) {
   const cor = TIPO_COR[n.tipo];
-  const data = n.criadaEm;
-  const horaLabel = isToday(data)
-    ? format(data, "HH:mm")
-    : isYesterday(data)
-      ? "ontem"
-      : isThisWeek(data, { locale: ptBR })
-        ? format(data, "EEE", { locale: ptBR })
-        : format(data, "dd/MM");
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const horaLabel = mounted ? formatRelativo(n.criadaEm) : "";
 
   return (
     <button
