@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { differenceInCalendarDays, parseISO, startOfDay } from "date-fns";
 import { useAppStore } from "@/store/appStore";
 import { useNotificacoes } from "@/hooks/useNotificacoes";
@@ -48,8 +48,11 @@ export function Sidebar() {
   const { naoLidas, naoLidasPorTipo } = useNotificacoes();
   const [painelOpen, setPainelOpen] = useState(false);
   const sinoRef = useRef<HTMLButtonElement | null>(null);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const counts = useMemo(() => {
+    if (!mounted) return { risco: 0, proximo: 0 };
     const hoje = startOfDay(new Date());
     let risco = 0, proximo = 0;
     for (const c of contratos) {
@@ -59,7 +62,7 @@ export function Sidebar() {
       else if (dias <= 30) proximo++;
     }
     return { risco, proximo };
-  }, [contratos]);
+  }, [contratos, mounted]);
 
   return (
     <>
@@ -123,8 +126,8 @@ export function Sidebar() {
                       <span className="flex-1">{it.label}</span>
                       {badge > 0 && (
                         <span
-                          className="text-[11px] font-semibold text-white"
-                          style={{ marginLeft: 8, padding: "2px 6px", borderRadius: 10, background: badgeColor }}
+                          className="text-[11px] font-semibold text-white leading-none"
+                          style={{ marginLeft: 8, padding: "2px 7px", borderRadius: 10, background: badgeColor }}
                         >
                           {badge}
                         </span>
