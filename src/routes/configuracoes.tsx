@@ -102,10 +102,9 @@ function ConfiguracoesPage() {
           </div>
         </Surface>
 
-        <Surface
-          title="Responsáveis"
-          right={
-            !adicionando ? (
+        <Surface title="Responsáveis">
+          <div className="flex items-center justify-end mb-3 -mt-2">
+            {!adicionando && (
               <button
                 type="button"
                 onClick={() => { setAdicionando(true); setEditandoId(null); setErro(null); }}
@@ -113,11 +112,10 @@ function ConfiguracoesPage() {
                 style={{ background: COLORS.brand, color: "#fff" }}
                 aria-label="Adicionar responsável"
               >
-                <Plus size={14} /> Adicionar
+                <Plus size={14} /> Adicionar responsável
               </button>
-            ) : null
-          }
-        >
+            )}
+          </div>
           {erro && (
             <div
               className="mb-2 rounded-md px-3 py-2 text-[12px]"
