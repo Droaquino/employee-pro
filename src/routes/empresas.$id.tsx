@@ -105,6 +105,7 @@ function EmpresaDetail() {
         <ContratosTable
           contratos={filtered}
           selectable
+          expandable
           selected={selected}
           onSelectionChange={setSelected}
           onClearFilters={() => setFilters(initialFilters)}
