@@ -27,6 +27,7 @@ export const Route = createFileRoute("/empresas/$id")({
 
 function EmpresaDetail() {
   const { id } = Route.useParams();
+  const navigate = useNavigate();
   const empresa = useAppStore((s) => s.empresas.find((e) => e.id === id));
   const contratos = useAppStore((s) => s.contratos.filter((c) => c.empresaId === id));
   const encerrarContratos = useAppStore((s) => s.encerrarContratos);
