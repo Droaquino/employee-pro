@@ -18,6 +18,7 @@ import { Route as ContratosRouteImport } from './routes/contratos'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EmpresasIdRouteImport } from './routes/empresas.$id'
+import { Route as ClienteIdPainelRouteImport } from './routes/cliente.$id.painel'
 
 const RelatoriosRoute = RelatoriosRouteImport.update({
   id: '/relatorios',
@@ -64,6 +65,11 @@ const EmpresasIdRoute = EmpresasIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => EmpresasRoute,
 } as any)
+const ClienteIdPainelRoute = ClienteIdPainelRouteImport.update({
+  id: '/cliente/$id/painel',
+  path: '/cliente/$id/painel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/proximos-vencimentos': typeof ProximosVencimentosRoute
   '/relatorios': typeof RelatoriosRoute
   '/empresas/$id': typeof EmpresasIdRoute
+  '/cliente/$id/painel': typeof ClienteIdPainelRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/proximos-vencimentos': typeof ProximosVencimentosRoute
   '/relatorios': typeof RelatoriosRoute
   '/empresas/$id': typeof EmpresasIdRoute
+  '/cliente/$id/painel': typeof ClienteIdPainelRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/proximos-vencimentos': typeof ProximosVencimentosRoute
   '/relatorios': typeof RelatoriosRoute
   '/empresas/$id': typeof EmpresasIdRoute
+  '/cliente/$id/painel': typeof ClienteIdPainelRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/proximos-vencimentos'
     | '/relatorios'
     | '/empresas/$id'
+    | '/cliente/$id/painel'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/proximos-vencimentos'
     | '/relatorios'
     | '/empresas/$id'
+    | '/cliente/$id/painel'
   id:
     | '__root__'
     | '/'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/proximos-vencimentos'
     | '/relatorios'
     | '/empresas/$id'
+    | '/cliente/$id/painel'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -144,6 +156,7 @@ export interface RootRouteChildren {
   HistoricoRoute: typeof HistoricoRoute
   ProximosVencimentosRoute: typeof ProximosVencimentosRoute
   RelatoriosRoute: typeof RelatoriosRoute
+  ClienteIdPainelRoute: typeof ClienteIdPainelRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -211,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmpresasIdRouteImport
       parentRoute: typeof EmpresasRoute
     }
+    '/cliente/$id/painel': {
+      id: '/cliente/$id/painel'
+      path: '/cliente/$id/painel'
+      fullPath: '/cliente/$id/painel'
+      preLoaderRoute: typeof ClienteIdPainelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -235,7 +255,18 @@ const rootRouteChildren: RootRouteChildren = {
   HistoricoRoute: HistoricoRoute,
   ProximosVencimentosRoute: ProximosVencimentosRoute,
   RelatoriosRoute: RelatoriosRoute,
+  ClienteIdPainelRoute: ClienteIdPainelRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
