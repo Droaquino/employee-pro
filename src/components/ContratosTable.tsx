@@ -16,9 +16,11 @@ type Props = {
   onSelectionChange?: (ids: string[]) => void;
   onClearFilters?: () => void;
   caption?: string;
+  expandable?: boolean;
 };
 
-export function ContratosTable({ contratos, selectable, selected = [], onSelectionChange, onClearFilters, caption }: Props) {
+export function ContratosTable({ contratos, selectable, selected = [], onSelectionChange, onClearFilters, caption, expandable }: Props) {
+  const [expanded, setExpanded] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>("diasRestantes");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
 
