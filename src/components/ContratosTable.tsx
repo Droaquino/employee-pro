@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { acaoRecomendada, calcStatus, maskCpf } from "@/hooks/useStatusContrato";
 import { STATUS_COLOR, STATUS_LABEL } from "@/constants/colors";
@@ -16,9 +16,11 @@ type Props = {
   onSelectionChange?: (ids: string[]) => void;
   onClearFilters?: () => void;
   caption?: string;
+  expandable?: boolean;
 };
 
-export function ContratosTable({ contratos, selectable, selected = [], onSelectionChange, onClearFilters, caption }: Props) {
+export function ContratosTable({ contratos, selectable, selected = [], onSelectionChange, onClearFilters, caption, expandable }: Props) {
+  const [expanded, setExpanded] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>("diasRestantes");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
 
@@ -83,13 +85,22 @@ export function ContratosTable({ contratos, selectable, selected = [], onSelecti
         </thead>
         <tbody>
           {rows.map(({ c, info }) => (
-            <tr key={c.id} style={{ borderTop: "1px solid #e2e5f0", background: selected.includes(c.id) ? "#f0f5ff" : undefined }}>
+            <React.Fragment key={c.id}>
+            <tr
+              onClick={expandable ? () => setExpanded(expanded === c.id ? null : c.id) : undefined}
+              style={{ borderTop: "1px solid #e2e5f0", background: selected.includes(c.id) ? "#f0f5ff" : undefined, cursor: expandable ? "pointer" : undefined }}
+            >
               {selectable && (
                 <Td>
-                  <input type="checkbox" aria-label={`Selecionar ${c.funcionarioNome}`} checked={selected.includes(c.id)} onChange={() => toggleOne(c.id)} />
+                  <input type="checkbox" aria-label={`Selecionar ${c.funcionarioNome}`} checked={selected.includes(c.id)} onChange={(e) => { e.stopPropagation(); toggleOne(c.id); }} />
                 </Td>
               )}
-              <Td>{c.funcionarioNome}</Td>
+              <Td>
+                <div className="flex items-center gap-2">
+                  <span aria-hidden style={{ display: "inline-block", width: 6, height: 22, borderRadius: 2, background: STATUS_COLOR[info.status] }} />
+                  <span>{c.funcionarioNome}</span>
+                </div>
+              </Td>
               <Td>{maskCpf(c.funcionarioCpf)}</Td>
               <Td>{c.cargo}</Td>
               <Td>{format(parseISO(c.dataAdmissao), "dd/MM/yyyy")}</Td>
@@ -112,9 +123,31 @@ export function ContratosTable({ contratos, selectable, selected = [], onSelecti
                 </span>
               </Td>
             </tr>
+            {expandable && expanded === c.id && (
+              <tr style={{ background: "#f8fafc" }}>
+                <td colSpan={selectable ? 9 : 8} className="px-4 py-3">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[12px]">
+                    <ExpField label="1º vencimento" value={format(parseISO(c.vencimentoPrimeiro), "dd/MM/yyyy")} />
+                    <ExpField label="2º vencimento" value={format(parseISO(c.vencimentoSegundo), "dd/MM/yyyy")} />
+                    <ExpField label="Prorrogação atual" value={`${c.prorrogacaoAtual}ª`} />
+                    <ExpField label="Motivo encerramento" value={c.motivoEncerramento ?? "—"} />
+                  </div>
+                </td>
+              </tr>
+            )}
+            </React.Fragment>
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+function ExpField({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <div className="uppercase text-[10px] tracking-wider" style={{ color: "#64748b" }}>{label}</div>
+      <div className="mt-1 text-[12px]" style={{ color: "#0f172a" }}>{value}</div>
     </div>
   );
 }
