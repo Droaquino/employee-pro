@@ -55,7 +55,17 @@ function EmpresaDetail() {
         { label: empresa.nomeFantasia },
       ]} />
 
-      <PageHeader title={empresa.razaoSocial} subtitle={`${empresa.nomeFantasia} · ${empresa.cnpj}`} />
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <PageHeader title={empresa.razaoSocial} subtitle={`${empresa.nomeFantasia} · ${empresa.cnpj}`} />
+        <button
+          onClick={() => navigate({ to: "/cliente/$id/painel", params: { id } })}
+          className="text-[12px] px-3 py-1.5 rounded-md inline-flex items-center gap-1.5 mt-1"
+          style={{ border: "1px solid #071040", color: "#071040", background: "#fff" }}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 3h6v6M10 14L21 3M21 14v7H3V3h7"/></svg>
+          Painel do cliente
+        </button>
+      </div>
 
       <Surface className="mb-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[12px]">
