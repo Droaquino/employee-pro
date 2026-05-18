@@ -85,9 +85,8 @@ export function ContratosTable({ contratos, selectable, selected = [], onSelecti
         </thead>
         <tbody>
           {rows.map(({ c, info }) => (
-            <>
+            <React.Fragment key={c.id}>
             <tr
-              key={c.id}
               onClick={expandable ? () => setExpanded(expanded === c.id ? null : c.id) : undefined}
               style={{ borderTop: "1px solid #e2e5f0", background: selected.includes(c.id) ? "#f0f5ff" : undefined, cursor: expandable ? "pointer" : undefined }}
             >
@@ -125,18 +124,18 @@ export function ContratosTable({ contratos, selectable, selected = [], onSelecti
               </Td>
             </tr>
             {expandable && expanded === c.id && (
-              <tr key={c.id + "-exp"} style={{ background: "#f8fafc" }}>
+              <tr style={{ background: "#f8fafc" }}>
                 <td colSpan={selectable ? 9 : 8} className="px-4 py-3">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[12px]">
                     <ExpField label="1º vencimento" value={format(parseISO(c.vencimentoPrimeiro), "dd/MM/yyyy")} />
                     <ExpField label="2º vencimento" value={format(parseISO(c.vencimentoSegundo), "dd/MM/yyyy")} />
-                    <ExpField label="Salário" value={c.salario ? `R$ ${c.salario.toLocaleString("pt-BR")}` : "—"} />
-                    <ExpField label="Observações" value={c.observacoes ?? "—"} />
+                    <ExpField label="Prorrogação atual" value={`${c.prorrogacaoAtual}ª`} />
+                    <ExpField label="Motivo encerramento" value={c.motivoEncerramento ?? "—"} />
                   </div>
                 </td>
               </tr>
             )}
-            </>
+            </React.Fragment>
           ))}
         </tbody>
       </table>
