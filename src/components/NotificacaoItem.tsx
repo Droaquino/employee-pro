@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 import { differenceInCalendarDays, format, formatDistanceToNow, isToday } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { Notificacao, TipoNotif } from "@/hooks/useNotificacoes";
@@ -34,9 +33,7 @@ function formatRelativo(data: Date) {
 
 export function NotificacaoItem({ n, onClick }: Props) {
   const cor = TIPO_COR[n.tipo];
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  const horaLabel = mounted ? formatRelativo(n.criadaEm) : "";
+  const horaLabel = formatRelativo(n.criadaEm);
 
   return (
     <button
@@ -63,7 +60,7 @@ export function NotificacaoItem({ n, onClick }: Props) {
             <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: cor }}>
               {TIPO_LABEL[n.tipo]}
             </span>
-            <span className="text-[11px]" style={{ color: COLORS.textMuted }}>{horaLabel}</span>
+            <span className="text-[11px]" style={{ color: "#8fa3cc" }}>{horaLabel}</span>
           </div>
           <div className="text-[13px] font-semibold mt-0.5" style={{ color: COLORS.textPrimary }}>
             {n.titulo}

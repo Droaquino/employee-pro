@@ -58,7 +58,7 @@ export function Sidebar() {
     for (const c of contratos) {
       if (c.encerrado) continue;
       const dias = differenceInCalendarDays(startOfDay(parseISO(c.vencimentoSegundo)), hoje);
-      if (dias < 0 || dias <= 7) risco++;
+      if (dias < 0 || dias <= 15) risco++;
       else if (dias <= 30) proximo++;
     }
     return { risco, proximo };
@@ -126,8 +126,8 @@ export function Sidebar() {
                       <span className="flex-1">{it.label}</span>
                       {badge > 0 && (
                         <span
-                          className="text-[11px] font-semibold text-white leading-none"
-                          style={{ marginLeft: 8, padding: "2px 7px", borderRadius: 10, background: badgeColor }}
+                          className="text-[11px] font-semibold text-white"
+                          style={{ marginLeft: 8, padding: "2px 7px", borderRadius: 10, background: badgeColor, display: "inline-flex", alignItems: "center", lineHeight: 1.4 }}
                         >
                           {badge}
                         </span>
