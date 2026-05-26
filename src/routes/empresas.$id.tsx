@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { PageHeader, Surface } from "@/components/Surface";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { useAppStore } from "@/store/appStore";
@@ -37,6 +38,10 @@ function EmpresaDetail() {
 
   if (!empresa) throw notFound();
 
+  useEffect(() => {
+    document.title = `${empresa.nomeFantasia} · Arbrent`;
+  }, [empresa.nomeFantasia]);
+
   const respNome = responsaveis.find((r) => r.id === empresa.responsavelId)?.nome ?? "—";
   const ativos = contratos.filter((c) => !c.encerrado);
   const filtered = useMemo(() => applyFilters(contratos, filters), [contratos, filters]);
@@ -44,6 +49,7 @@ function EmpresaDetail() {
   const handleEncerrar = () => {
     if (selected.length === 0) return;
     encerrarContratos(selected, "Encerrado em lote");
+    toast.success(`${selected.length} contrato${selected.length !== 1 ? "s" : ""} encerrado${selected.length !== 1 ? "s" : ""}`);
     setSelected([]);
   };
 

@@ -27,7 +27,10 @@ export function StatusPieChart({ contratos }: { contratos: Contrato[] }) {
             ))}
           </Pie>
           <Tooltip
-            formatter={(value: number, name: string) => [`${value} (${((value / total) * 100).toFixed(1)}%)`, name]}
+            formatter={(value: number, name: string) => [
+              `${value} contrato${value !== 1 ? "s" : ""} (${((value / total) * 100).toFixed(0)}% da carteira)`,
+              name,
+            ]}
             contentStyle={{ background: "#fff", border: `1px solid ${COLORS.borderSoft}`, borderRadius: 6, fontSize: 12 }}
           />
         </PieChart>

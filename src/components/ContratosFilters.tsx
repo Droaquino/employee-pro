@@ -65,7 +65,7 @@ export function ContratosFilters({ contratos, total, filtered, value, onChange }
           {cargos.map((c) => <option key={c} value={c}>{c}</option>)}
         </select>
         <span className="text-[12px]" style={{ color: "#64748b" }}>
-          {filtered} de {total} contratos
+          Exibindo <strong style={{ color: "#0f172a" }}>{filtered}</strong> de {total} contratos
         </span>
         {active && (
           <button

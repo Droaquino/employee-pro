@@ -14,7 +14,7 @@ import { useMemo } from "react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Experiência" },
+      { title: "Dashboard · Arbrent" },
       { name: "description", content: "Visão consolidada dos contratos de experiência da carteira." },
     ],
   }),

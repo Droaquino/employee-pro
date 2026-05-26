@@ -172,7 +172,12 @@ function EmpresasPage() {
         open={open}
         initial={editing}
         onClose={() => setOpen(false)}
-        onSave={(emp) => { upsertEmpresa(emp); setOpen(false); }}
+        onSave={(emp) => {
+          const isNew = !empresas.find((e) => e.id === emp.id);
+          upsertEmpresa(emp);
+          setOpen(false);
+          toast.success(isNew ? `Empresa "${emp.nomeFantasia}" criada` : `Empresa "${emp.nomeFantasia}" atualizada`);
+        }}
       />
     </div>
   );

@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { PageHeader, Surface } from "@/components/Surface";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { useAppStore } from "@/store/appStore";
@@ -23,6 +24,10 @@ function EmRisco() {
     const s = calcStatus(c).status;
     return s === "RISCO" || s === "VENCIDO";
   });
+
+  useEffect(() => {
+    document.title = contratos.length > 0 ? `⚠ ${contratos.length} em risco · Arbrent` : "Em risco · Arbrent";
+  }, [contratos.length]);
 
   return (
     <div>

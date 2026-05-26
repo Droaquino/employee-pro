@@ -5,12 +5,14 @@ import {
   createRootRouteWithContext,
   HeadContent,
   Scripts,
+  useRouterState,
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
 import { Sidebar } from "@/components/Sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { CalculadoraPrazo } from "@/components/CalculadoraPrazo";
+import { BuscaGlobal } from "@/components/BuscaGlobal";
 
 function NotFoundComponent() {
   return (
@@ -73,6 +75,18 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isClientPanel = /^\/cliente\/[^/]+\/painel/.test(pathname);
+
+  if (isClientPanel) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <Outlet />
+        <Toaster richColors position="top-right" />
+      </QueryClientProvider>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <div style={{ background: "#f0f2f8", minHeight: "100vh" }}>
@@ -82,6 +96,7 @@ function RootComponent() {
         </main>
         <Toaster richColors position="top-right" />
         <CalculadoraPrazo />
+        <BuscaGlobal />
       </div>
     </QueryClientProvider>
   );

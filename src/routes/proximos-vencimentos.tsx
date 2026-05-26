@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { differenceInCalendarDays, format, parseISO, startOfDay } from "date-fns";
 import { PageHeader, Surface } from "@/components/Surface";
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -54,6 +54,10 @@ function Proximos() {
   }, [lista]);
 
   const empresaNome = (id: string) => empresas.find((e) => e.id === id)?.nomeFantasia ?? "—";
+
+  useEffect(() => {
+    document.title = lista.length > 0 ? `${lista.length} próximos · Arbrent` : "Próximos vencimentos · Arbrent";
+  }, [lista.length]);
 
   return (
     <div>
