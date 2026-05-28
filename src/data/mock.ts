@@ -12,6 +12,18 @@ export type Empresa = {
   criadoEm: string;
 };
 
+export type Colaborador = {
+  id: string;
+  empresaId: string;
+  nome: string;
+  cpf: string;
+  cargo: string;
+  email: string;
+  telefone: string;
+  ativo: boolean;
+  criadoEm: string;
+};
+
 export type Contrato = {
   id: string;
   empresaId: string;
