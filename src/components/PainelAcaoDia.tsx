@@ -1,17 +1,40 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useAppStore } from "@/store/appStore";
 import { calcStatus } from "@/hooks/useStatusContrato";
 
+/** Anima um número de 0 até `target` em `duration` ms */
+function useCountUp(target: number, duration = 700) {
+  const [value, setValue] = useState(0);
+  const rafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (target === 0) { setValue(0); return; }
+    const start = performance.now();
+    const animate = (now: number) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(Math.round(eased * target));
+      if (progress < 1) rafRef.current = requestAnimationFrame(animate);
+    };
+    rafRef.current = requestAnimationFrame(animate);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+  }, [target, duration]);
+
+  return value;
+}
+
 export function PainelAcaoDia() {
   const contratos = useAppStore((s) => s.contratos);
 
   const counts = useMemo(() => {
-    let urgente = 0; // vence em <= 7 dias (não vencidos)
-    let agendar = 0; // vence em 8-30 dias
-    let vencidos = 0; // já vencidos
+    let urgente = 0;
+    let agendar = 0;
+    let vencidos = 0;
     for (const c of contratos) {
       if (c.encerrado) continue;
       const { diasRestantes } = calcStatus(c);
@@ -79,34 +102,25 @@ export function PainelAcaoDia() {
 }
 
 function Item({
-  dot,
-  number,
-  label,
-  ctaLabel,
-  to,
+  dot, number, label, ctaLabel, to,
 }: {
-  dot: string;
-  number: number;
-  label: string;
-  ctaLabel: string;
-  to: string;
+  dot: string; number: number; label: string; ctaLabel: string; to: string;
 }) {
+  const animated = useCountUp(number);
   return (
     <div className="flex items-center gap-3">
-      <span
-        aria-hidden
-        className="inline-block rounded-full shrink-0"
-        style={{ background: dot, width: 10, height: 10 }}
-      />
+      <span aria-hidden className="inline-block rounded-full shrink-0" style={{ background: dot, width: 10, height: 10 }} />
       <div className="flex items-baseline gap-2 flex-wrap">
-        <span className="font-bold text-white" style={{ fontSize: 28, lineHeight: 1 }}>
-          {number}
+        <span
+          className="font-bold tabular-nums"
+          style={{ fontSize: 28, lineHeight: 1, color: "#fff", transition: "color 0.3s" }}
+        >
+          {animated}
         </span>
         <span style={{ fontSize: 13, color: "#a8c7ff" }}>{label}</span>
         <Link
           to={to}
-          aria-label={ctaLabel}
-          className="hover:underline"
+          className="hover:underline transition-opacity hover:opacity-80"
           style={{ fontSize: 13, color: "#4f8ef7" }}
         >
           → {ctaLabel}

@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
-import { format, parseISO } from "date-fns";
+import { differenceInCalendarDays, format, parseISO, startOfDay } from "date-fns";
 import { toast } from "sonner";
 import { acaoRecomendada, calcStatus, maskCpf } from "@/hooks/useStatusContrato";
 import { STATUS_COLOR, STATUS_LABEL } from "@/constants/colors";
@@ -20,7 +20,6 @@ type Props = {
   expandable?: boolean;
 };
 
-// Cores do semáforo conforme spec (distintas das badges)
 const SEMAFORO: Record<string, string> = {
   VIGENTE: "#16a34a",
   PROXIMO: "#d97706",
@@ -28,12 +27,84 @@ const SEMAFORO: Record<string, string> = {
   VENCIDO: "#7f1d1d",
 };
 
+const MAX_DIAS_CONTRATO = 180;
+
+/** Barra de progresso do prazo: quanto dos 180 dias legais já foi consumido */
+function PrazoBar({ dataAdmissao, status }: { dataAdmissao: string; status: string }) {
+  const diasUsados = differenceInCalendarDays(startOfDay(new Date()), startOfDay(parseISO(dataAdmissao)));
+  const pct = Math.min(Math.max((diasUsados / MAX_DIAS_CONTRATO) * 100, 0), 100);
+  const cor = SEMAFORO[status];
+  return (
+    <div title={`${diasUsados} de ${MAX_DIAS_CONTRATO} dias usados`} style={{ width: 80, position: "relative" }}>
+      <div style={{ height: 5, borderRadius: 99, background: "#e2e5f0", overflow: "hidden" }}>
+        <div
+          style={{
+            height: "100%", width: `${pct}%`, borderRadius: 99,
+            background: cor, transition: "width 0.6s cubic-bezier(0.22,1,0.36,1)",
+          }}
+        />
+      </div>
+      <div className="text-[10px] mt-0.5 text-right tabular-nums" style={{ color: "#94a3b8" }}>
+        {diasUsados}d / {MAX_DIAS_CONTRATO}d
+      </div>
+    </div>
+  );
+}
+
+/** Tooltip rico ao passar mouse sobre o nome do funcionário */
+function NomeTooltip({ c, info }: { c: Contrato; info: ReturnType<typeof calcStatus> }) {
+  const [show, setShow] = useState(false);
+  const cor = STATUS_COLOR[info.status];
+  const f = formatDiasRestantes(info.diasRestantes);
+
+  return (
+    <div
+      className="relative inline-block"
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+    >
+      <span className="cursor-default underline decoration-dotted decoration-slate-300">
+        {c.funcionarioNome}
+      </span>
+      {show && (
+        <div
+          style={{
+            position: "absolute", left: 0, top: "calc(100% + 6px)", zIndex: 60,
+            background: "#0f172a", color: "#f8fafc", borderRadius: 8,
+            padding: "10px 14px", minWidth: 220, boxShadow: "0 8px 24px rgba(0,0,0,0.25)",
+            pointerEvents: "none",
+            animation: "page-enter 0.15s ease both",
+          }}
+        >
+          <div className="font-semibold text-[13px] mb-2">{c.funcionarioNome}</div>
+          <div className="space-y-1 text-[11px]" style={{ color: "#94a3b8" }}>
+            <div><span style={{ color: "#cbd5e1" }}>Cargo:</span> {c.cargo}</div>
+            <div><span style={{ color: "#cbd5e1" }}>Admissão:</span> {format(parseISO(c.dataAdmissao), "dd/MM/yyyy")}</div>
+            <div><span style={{ color: "#cbd5e1" }}>Vencimento:</span> {format(parseISO(c.vencimentoSegundo), "dd/MM/yyyy")}</div>
+            <div className="flex items-center gap-1.5 mt-1">
+              <span className="w-2 h-2 rounded-full" style={{ background: cor }} />
+              <span style={{ color: f.cor, fontWeight: 600 }}>{f.texto}</span>
+            </div>
+          </div>
+          {/* Seta */}
+          <div style={{
+            position: "absolute", top: -5, left: 14,
+            width: 10, height: 10, background: "#0f172a",
+            transform: "rotate(45deg)", borderRadius: 2,
+          }} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function ContratosTable({ contratos, selectable, selected = [], onSelectionChange, onClearFilters, caption, expandable }: Props) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>("diasRestantes");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [feedbackRow, setFeedbackRow] = useState<string | null>(null);
   const [observations, setObservations] = useState<Record<string, string>>({});
+  const [hoveredRow, setHoveredRow] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const rows = useMemo(() => {
@@ -84,7 +155,7 @@ export function ContratosTable({ contratos, selectable, selected = [], onSelecti
     }, 1000);
   };
 
-  const totalCols = 9 + (selectable ? 1 : 0);
+  const totalCols = 10 + (selectable ? 1 : 0); // +1 para coluna prazo
 
   return (
     <div className="overflow-x-auto">
@@ -92,7 +163,6 @@ export function ContratosTable({ contratos, selectable, selected = [], onSelecti
         {caption && <caption className="sr-only">{caption}</caption>}
         <thead>
           <tr style={{ color: "#64748b", textAlign: "left" }}>
-            {/* Coluna semáforo — sem header, 6px */}
             <th style={{ width: 6, padding: 0 }} aria-hidden />
             {selectable && (
               <Th>
@@ -106,29 +176,36 @@ export function ContratosTable({ contratos, selectable, selected = [], onSelecti
             <SortableTh label="Vencimento 2ª" k="vencimentoSegundo" sortKey={sortKey} sortDir={sortDir} onClick={headerSort} />
             <SortableTh label="Status" k="status" sortKey={sortKey} sortDir={sortDir} onClick={headerSort} />
             <SortableTh label="Dias restantes" k="diasRestantes" sortKey={sortKey} sortDir={sortDir} onClick={headerSort} />
+            <Th>Prazo</Th>
             <Th>Ação recomendada</Th>
           </tr>
         </thead>
         <tbody>
-          {rows.map(({ c, info }) => {
+          {rows.map(({ c, info }, idx) => {
             const isExpanded = expandable && expanded === c.id;
             const isFeedback = feedbackRow === c.id;
+            const isHovered = hoveredRow === c.id;
             const semaforoColor = SEMAFORO[info.status];
+            const delay = Math.min(idx * 28, 400);
 
             return (
               <React.Fragment key={c.id}>
                 <tr
+                  className="row-stagger"
+                  style={{ animationDelay: `${delay}ms` }}
                   onClick={expandable ? () => { if (!isFeedback) setExpanded(expanded === c.id ? null : c.id); } : undefined}
-                  style={{
-                    borderTop: "1px solid #e2e5f0",
-                    background: isFeedback ? "#dcfce7" : selected.includes(c.id) ? "#f0f5ff" : undefined,
-                    cursor: expandable ? "pointer" : undefined,
-                    transition: "background 0.4s",
-                  }}
+                  onMouseEnter={() => setHoveredRow(c.id)}
+                  onMouseLeave={() => setHoveredRow(null)}
+                  aria-expanded={expandable ? isExpanded : undefined}
                 >
-                  {/* Barra semáforo vertical */}
+                  {/* Barra semáforo — destaca mais no hover */}
                   <td
-                    style={{ width: 6, padding: 0, background: semaforoColor }}
+                    style={{
+                      width: 6, padding: 0,
+                      background: semaforoColor,
+                      opacity: isHovered ? 1 : 0.75,
+                      transition: "opacity 0.2s",
+                    }}
                     className={info.status === "VENCIDO" ? "animate-pulse" : undefined}
                     aria-hidden
                   />
@@ -140,7 +217,7 @@ export function ContratosTable({ contratos, selectable, selected = [], onSelecti
                   <Td>
                     <div className="flex items-center gap-2">
                       {isFeedback && <span style={{ color: "#16a34a", fontWeight: 700 }}>✓</span>}
-                      <span>{c.funcionarioNome}</span>
+                      <NomeTooltip c={c} info={info} />
                     </div>
                   </Td>
                   <Td>{maskCpf(c.funcionarioCpf)}</Td>
@@ -160,7 +237,13 @@ export function ContratosTable({ contratos, selectable, selected = [], onSelecti
                     })()}
                   </Td>
                   <Td>
-                    <span style={{ color: info.status === "VENCIDO" ? STATUS_COLOR.VENCIDO : info.status === "RISCO" ? STATUS_COLOR.RISCO : "#0f172a", fontWeight: info.status === "VENCIDO" || info.status === "RISCO" ? 600 : 400 }}>
+                    <PrazoBar dataAdmissao={c.dataAdmissao} status={info.status} />
+                  </Td>
+                  <Td>
+                    <span style={{
+                      color: info.status === "VENCIDO" ? STATUS_COLOR.VENCIDO : info.status === "RISCO" ? STATUS_COLOR.RISCO : "#0f172a",
+                      fontWeight: info.status === "VENCIDO" || info.status === "RISCO" ? 600 : 400,
+                    }}>
                       {acaoRecomendada(info, c)}
                     </span>
                   </Td>
@@ -169,9 +252,8 @@ export function ContratosTable({ contratos, selectable, selected = [], onSelecti
                 {/* Painel expansível */}
                 {isExpanded && (
                   <tr style={{ background: "#f8fafc" }}>
-                    <td colSpan={totalCols} className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
+                    <td colSpan={totalCols} className="panel-expand px-5 py-4" onClick={(e) => e.stopPropagation()}>
                       <div className="space-y-3 max-w-2xl">
-                        {/* Linha do tempo */}
                         <div className="flex items-center gap-1.5 text-[12px] flex-wrap" style={{ color: "#64748b" }}>
                           <span>Admissão <strong style={{ color: "#0f172a" }}>{format(parseISO(c.dataAdmissao), "dd/MM/yyyy")}</strong></span>
                           <span style={{ color: "#cbd5e1" }}>→</span>
@@ -181,8 +263,6 @@ export function ContratosTable({ contratos, selectable, selected = [], onSelecti
                           <span style={{ color: "#cbd5e1" }}>→</span>
                           <span>2ª Prorr. <strong style={{ color: info.status === "VENCIDO" ? "#dc2626" : "#0f172a" }}>{format(parseISO(c.vencimentoSegundo), "dd/MM/yyyy")}</strong></span>
                         </div>
-
-                        {/* Textarea observação */}
                         <textarea
                           rows={2}
                           placeholder="Registrar observação..."
@@ -192,16 +272,12 @@ export function ContratosTable({ contratos, selectable, selected = [], onSelecti
                           className="w-full px-3 py-2 rounded-md text-[12px] resize-none outline-none"
                           style={{ border: "1px solid #e2e5f0", background: "#fff" }}
                         />
-
-                        {/* Botões de ação */}
                         <div className="flex items-center gap-2">
-                          {(
-                            [
-                              { label: "Efetivar", bg: "#16a34a" },
-                              { label: "Não renovar", bg: "#dc2626" },
-                              { label: "Aguardar", bg: "#d97706" },
-                            ] as const
-                          ).map(({ label, bg }) => (
+                          {([
+                            { label: "Efetivar", bg: "#16a34a" },
+                            { label: "Não renovar", bg: "#dc2626" },
+                            { label: "Aguardar", bg: "#d97706" },
+                          ] as const).map(({ label, bg }) => (
                             <button
                               key={label}
                               onClick={(e) => { e.stopPropagation(); handleAction(c.id, label); }}

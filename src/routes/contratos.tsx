@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { format, parseISO } from "date-fns";
+import { differenceInCalendarDays, format, parseISO, startOfDay } from "date-fns";
 import { toast } from "sonner";
 import { PageHeader, Surface } from "@/components/Surface";
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -45,25 +45,27 @@ function ContratosPage() {
     } catch {}
   };
 
-  const handleEmpresaChange = (id: string) => {
-    setEmpresaId(id);
-    persist(id, filters);
-  };
-
-  const handleFiltersChange = (next: FiltersState) => {
-    setFilters(next);
-    persist(empresaId, next);
-  };
-
-  const handleClearAll = () => {
-    setFilters(initialFilters);
-    setEmpresaId("");
-    persist("", initialFilters);
-  };
+  const handleEmpresaChange = (id: string) => { setEmpresaId(id); persist(id, filters); };
+  const handleFiltersChange = (next: FiltersState) => { setFilters(next); persist(empresaId, next); };
+  const handleClearAll = () => { setFilters(initialFilters); setEmpresaId(""); persist("", initialFilters); };
 
   const base = useMemo(() => empresaId ? contratos.filter((c) => c.empresaId === empresaId) : contratos, [contratos, empresaId]);
   const filtered = useMemo(() => applyFilters(base, filters), [base, filters]);
   const empresaMap = useMemo(() => new Map(empresas.map((e) => [e.id, e.nomeFantasia])), [empresas]);
+
+  // Contagens para chips de filtro rápido
+  const chipCounts = useMemo(() => {
+    const hoje = startOfDay(new Date());
+    let hoje_ = 0, semana = 0, risco = 0;
+    for (const c of base) {
+      if (c.encerrado) continue;
+      const dias = differenceInCalendarDays(startOfDay(parseISO(c.vencimentoSegundo)), hoje);
+      if (dias === 0) hoje_++;
+      if (dias >= 0 && dias <= 7) semana++;
+      if (dias < 0 || dias <= 15) risco++;
+    }
+    return { hoje: hoje_, semana, risco };
+  }, [base]);
 
   const handleExport = () => {
     if (filtered.length === 0) { toast.error("Nada para exportar"); return; }
@@ -87,6 +89,22 @@ function ContratosPage() {
 
   const anyFilter = empresaId !== "" || hasActiveFilters(filters);
 
+  // Aplicar chip de filtro rápido
+  const applyChip = (chip: "hoje" | "semana" | "risco") => {
+    const hoje = startOfDay(new Date());
+    if (chip === "hoje") handleFiltersChange({ ...initialFilters, query: "" });
+    if (chip === "semana") handleFiltersChange({ ...initialFilters, status: "RISCO" });
+    if (chip === "risco") handleFiltersChange({ ...initialFilters, status: "RISCO" });
+    // Scroll suave para a tabela
+    setTimeout(() => document.getElementById("contratos-table")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+  };
+
+  const chips = [
+    { key: "hoje" as const,  label: "Vence hoje",    count: chipCounts.hoje,  color: "#7f1d1d", bg: "#fef2f2" },
+    { key: "semana" as const, label: "Esta semana",  count: chipCounts.semana, color: "#dc2626", bg: "#fef2f2" },
+    { key: "risco" as const,  label: "Em risco",     count: chipCounts.risco,  color: "#d97706", bg: "#fffbeb" },
+  ];
+
   return (
     <div>
       <Breadcrumb items={[{ label: "Gestão" }, { label: "Contratos" }]} />
@@ -99,6 +117,41 @@ function ContratosPage() {
           </button>
         }
       />
+
+      {/* Chips de filtro rápido */}
+      <div className="flex items-center gap-2 mb-4 flex-wrap">
+        {chips.map((chip) => (
+          <button
+            key={chip.key}
+            onClick={() => applyChip(chip.key)}
+            disabled={chip.count === 0}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[12px] font-medium transition-all hover:shadow-sm active:scale-95"
+            style={{
+              background: chip.count > 0 ? chip.bg : "#f8fafc",
+              color: chip.count > 0 ? chip.color : "#94a3b8",
+              border: `1px solid ${chip.count > 0 ? chip.color + "40" : "#e2e5f0"}`,
+              cursor: chip.count > 0 ? "pointer" : "default",
+            }}
+          >
+            <span
+              className="inline-flex items-center justify-center rounded-full text-[10px] font-bold text-white"
+              style={{
+                width: 18, height: 18,
+                background: chip.count > 0 ? chip.color : "#cbd5e1",
+                minWidth: 18,
+              }}
+            >
+              {chip.count}
+            </span>
+            {chip.label}
+          </button>
+        ))}
+        <div className="flex-1" />
+        <span className="text-[11px]" style={{ color: "#94a3b8" }}>
+          Ctrl+K para busca global
+        </span>
+      </div>
+
       <Surface>
         <div className="flex items-center gap-3 mb-3 flex-wrap">
           <select
@@ -112,6 +165,7 @@ function ContratosPage() {
             {empresas.map((e) => <option key={e.id} value={e.id}>{e.nomeFantasia}</option>)}
           </select>
         </div>
+
         <ContratosFilters
           contratos={base}
           total={base.length}
@@ -120,7 +174,6 @@ function ContratosPage() {
           onChange={handleFiltersChange}
         />
 
-        {/* Contador dinâmico + Limpar filtros */}
         <div className="flex items-center gap-3 mb-2">
           <span className="text-[12px]" style={{ color: "#64748b" }}>
             Exibindo <strong style={{ color: "#0f172a" }}>{filtered.length}</strong> de {base.length} contratos
@@ -128,7 +181,7 @@ function ContratosPage() {
           {anyFilter && (
             <button
               onClick={handleClearAll}
-              className="text-[12px] px-2 py-0.5 rounded"
+              className="text-[12px] px-2 py-0.5 rounded transition-colors hover:bg-red-50"
               style={{ color: "#ef4444", border: "1px solid #fecaca" }}
             >
               Limpar filtros
@@ -136,12 +189,14 @@ function ContratosPage() {
           )}
         </div>
 
-        <ContratosTable
-          contratos={filtered}
-          expandable
-          onClearFilters={handleClearAll}
-          caption="Contratos filtrados"
-        />
+        <div id="contratos-table">
+          <ContratosTable
+            contratos={filtered}
+            expandable
+            onClearFilters={handleClearAll}
+            caption="Contratos filtrados"
+          />
+        </div>
       </Surface>
     </div>
   );

@@ -7,6 +7,7 @@ import {
   Scripts,
   useRouterState,
 } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 
 import appCss from "../styles.css?url";
 import { Sidebar } from "@/components/Sidebar";
@@ -81,6 +82,49 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** Barra fina de progresso no topo durante navegação */
+function NavProgressBar() {
+  const isLoading = useRouterState({ select: (s) => s.isLoading });
+  const [visible, setVisible] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (isLoading) {
+      setVisible(true);
+    } else {
+      timerRef.current = setTimeout(() => setVisible(false), 400);
+    }
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [isLoading]);
+
+  if (!visible) return null;
+  return (
+    <div
+      className="nav-progress-bar"
+      style={{
+        position: "fixed", top: 0, left: 0, height: 3,
+        background: "linear-gradient(90deg, #4f8ef7, #a78bfa)",
+        zIndex: 9999, borderRadius: "0 2px 2px 0",
+      }}
+    />
+  );
+}
+
+/** Wrapper com animação de entrada de página */
+function PageTransition({ children, routeKey }: { children: React.ReactNode; routeKey: string }) {
+  const [animKey, setAnimKey] = useState(routeKey);
+
+  useEffect(() => {
+    setAnimKey(routeKey);
+  }, [routeKey]);
+
+  return (
+    <div key={animKey} className="page-enter">
+      {children}
+    </div>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -90,19 +134,22 @@ function RootComponent() {
     return (
       <QueryClientProvider client={queryClient}>
         <Outlet />
-        <Toaster richColors position="top-right" />
+        <Toaster richColors position="bottom-right" />
       </QueryClientProvider>
     );
   }
 
   return (
     <QueryClientProvider client={queryClient}>
+      <NavProgressBar />
       <div style={{ background: "#f0f2f8", minHeight: "100vh" }}>
         <Sidebar />
         <main style={{ marginLeft: 240, padding: 24 }}>
-          <Outlet />
+          <PageTransition routeKey={pathname}>
+            <Outlet />
+          </PageTransition>
         </main>
-        <Toaster richColors position="top-right" />
+        <Toaster richColors position="bottom-right" />
         <CalculadoraPrazo />
         <BuscaGlobal />
       </div>
