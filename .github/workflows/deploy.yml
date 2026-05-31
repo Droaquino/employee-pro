@@ -31,3 +31,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: dist/server
+          command: deploy index.js --compatibility-date 2025-09-24 --compatibility-flag nodejs_compat --name tanstack-start-app --assets ../client
