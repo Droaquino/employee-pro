@@ -1,5 +1,11 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist/client",
-  "framework": null
+  "framework": null,
+  "installCommand": "npm install",
+  "build": {
+    "env": {
+      "NODE_VERSION": "20"
+    }
+  }
 }
