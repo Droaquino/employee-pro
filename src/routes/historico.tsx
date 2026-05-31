@@ -31,19 +31,31 @@ function HistoricoPage() {
   return (
     <div>
       <Breadcrumb items={[{ label: "Operacional" }, { label: "Histórico" }]} />
-      <PageHeader title="Histórico de ações" subtitle="Registro das alterações realizadas durante esta sessão." />
+      <PageHeader
+        title="Histórico de ações"
+        subtitle="Registro das alterações realizadas durante esta sessão."
+      />
       <Surface>
         {historico.length === 0 ? (
-          <EmptyState icon="inbox" title="Nenhuma ação registrada" subtitle="Ações realizadas no sistema aparecerão aqui." />
+          <EmptyState
+            icon="inbox"
+            title="Nenhuma ação registrada"
+            subtitle="Ações realizadas no sistema aparecerão aqui."
+          />
         ) : (
           <ul className="divide-y" style={{ borderColor: "#e2e5f0" }}>
             {historico.map((ev) => {
               const meta = TIPO_LABEL[ev.tipo] ?? { label: ev.tipo, cor: "#64748b" };
               return (
                 <li key={ev.id} className="py-3 flex items-start gap-3">
-                  <span className="mt-1 w-2 h-2 rounded-full shrink-0" style={{ background: meta.cor }} />
+                  <span
+                    className="mt-1 w-2 h-2 rounded-full shrink-0"
+                    style={{ background: meta.cor }}
+                  />
                   <div className="flex-1 min-w-0">
-                    <div className="text-[13px]" style={{ color: "#0f172a" }}>{ev.descricao}</div>
+                    <div className="text-[13px]" style={{ color: "#0f172a" }}>
+                      {ev.descricao}
+                    </div>
                     <div className="text-[11px] mt-0.5" style={{ color: "#64748b" }}>
                       <span style={{ color: meta.cor, fontWeight: 600 }}>{meta.label}</span>
                       {" · "}

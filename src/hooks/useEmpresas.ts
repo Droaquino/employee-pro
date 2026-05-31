@@ -11,10 +11,7 @@ export function useEmpresas() {
   return useQuery({
     queryKey: EMPRESAS_KEY,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("empresas")
-        .select("*")
-        .order("nome_fantasia");
+      const { data, error } = await supabase.from("empresas").select("*").order("nome_fantasia");
       if (error) throw error;
       return (data ?? []).map(mapEmpresa);
     },
@@ -38,11 +35,7 @@ export function useUpsertEmpresa() {
         if (error) throw error;
         return mapEmpresa(data);
       }
-      const { data, error } = await supabase
-        .from("empresas")
-        .insert(row)
-        .select()
-        .single();
+      const { data, error } = await supabase.from("empresas").insert(row).select().single();
       if (error) throw error;
       return mapEmpresa(data);
     },
@@ -67,10 +60,7 @@ export function useRemoveEmpresa() {
 
   return useMutation({
     mutationFn: async (empresa: Empresa) => {
-      const { error } = await supabase
-        .from("empresas")
-        .delete()
-        .eq("id", empresa.id);
+      const { error } = await supabase.from("empresas").delete().eq("id", empresa.id);
       if (error) throw error;
     },
     onSuccess: async (_, empresa) => {
@@ -92,10 +82,7 @@ export function useToggleEmpresaAtivo() {
 
   return useMutation({
     mutationFn: async ({ id, ativo }: { id: string; ativo: boolean }) => {
-      const { error } = await supabase
-        .from("empresas")
-        .update({ ativo })
-        .eq("id", id);
+      const { error } = await supabase.from("empresas").update({ ativo }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: EMPRESAS_KEY }),

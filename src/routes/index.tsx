@@ -7,7 +7,13 @@ import { EvolucaoLineChart } from "@/components/charts/EvolucaoLineChart";
 import { HeatmapVencimentos } from "@/components/charts/HeatmapVencimentos";
 import { PainelAcaoDia } from "@/components/PainelAcaoDia";
 import { ChartInsight } from "@/components/ChartInsight";
-import { insightStatus, insightEmpresas, insightVencimentos, insightEvolucao, insightHeatmap } from "@/lib/insights";
+import {
+  insightStatus,
+  insightEmpresas,
+  insightVencimentos,
+  insightEvolucao,
+  insightHeatmap,
+} from "@/lib/insights";
 import { useMemo } from "react";
 import { useEmpresas } from "@/hooks/useEmpresas";
 import { useContratos } from "@/hooks/useContratos";
@@ -16,7 +22,10 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Dashboard · Arbrent" },
-      { name: "description", content: "Visão consolidada dos contratos de experiência da carteira." },
+      {
+        name: "description",
+        content: "Visão consolidada dos contratos de experiência da carteira.",
+      },
     ],
   }),
   component: Dashboard,
@@ -56,7 +65,10 @@ function Dashboard() {
           <EvolucaoLineChart contratos={contratos} />
           <ChartInsight insight={iEvol} />
         </Surface>
-        <Surface title="Mapa de calor — vencimentos por semana (próximos 3 meses)" className="lg:col-span-2">
+        <Surface
+          title="Mapa de calor — vencimentos por semana (próximos 3 meses)"
+          className="lg:col-span-2"
+        >
           <HeatmapVencimentos />
           <ChartInsight insight={iHeat} />
         </Surface>

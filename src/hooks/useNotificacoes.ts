@@ -1,5 +1,12 @@
 import { useCallback, useMemo } from "react";
-import { differenceInCalendarDays, format, getISOWeek, getISOWeekYear, parseISO, startOfDay } from "date-fns";
+import {
+  differenceInCalendarDays,
+  format,
+  getISOWeek,
+  getISOWeekYear,
+  parseISO,
+  startOfDay,
+} from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useAppStore } from "@/store/appStore";
 import { useEmpresas } from "@/hooks/useEmpresas";
@@ -33,19 +40,22 @@ const HISTORICO_NOTIF = new Set([
   "EMPRESA_CRIADA",
 ]);
 
-const HISTORICO_LABEL: Record<string, { titulo: (d: string) => string; rota: string; rotaLabel: string }> = {
-  CONTRATO_RENOVADO:  { titulo: (d) => d, rota: "/contratos",  rotaLabel: "Ver contratos" },
-  CONTRATO_ENCERRADO: { titulo: (d) => d, rota: "/historico",  rotaLabel: "Ver histórico" },
-  COLABORADOR_CRIADO: { titulo: (d) => d, rota: "/empresas",   rotaLabel: "Ver empresas" },
-  EMPRESA_CRIADA:     { titulo: (d) => d, rota: "/empresas",   rotaLabel: "Ver empresas" },
+const HISTORICO_LABEL: Record<
+  string,
+  { titulo: (d: string) => string; rota: string; rotaLabel: string }
+> = {
+  CONTRATO_RENOVADO: { titulo: (d) => d, rota: "/contratos", rotaLabel: "Ver contratos" },
+  CONTRATO_ENCERRADO: { titulo: (d) => d, rota: "/historico", rotaLabel: "Ver histórico" },
+  COLABORADOR_CRIADO: { titulo: (d) => d, rota: "/empresas", rotaLabel: "Ver empresas" },
+  EMPRESA_CRIADA: { titulo: (d) => d, rota: "/empresas", rotaLabel: "Ver empresas" },
 };
 
 export function useNotificacoes() {
-  const { data: contratos = [] }  = useContratos();
-  const { data: empresas = [] }   = useEmpresas();
-  const { data: historico = [] }  = useHistorico();
+  const { data: contratos = [] } = useContratos();
+  const { data: empresas = [] } = useEmpresas();
+  const { data: historico = [] } = useHistorico();
   const notifLidas = useAppStore((s) => s.notifLidas);
-  const _marcarLida       = useAppStore((s) => s.marcarNotifLida);
+  const _marcarLida = useAppStore((s) => s.marcarNotifLida);
   const _marcarTodasLidas = useAppStore((s) => s.marcarTodasNotifLidas);
 
   const empresaMap = useMemo(() => new Map(empresas.map((e) => [e.id, e])), [empresas]);
@@ -65,14 +75,14 @@ export function useNotificacoes() {
 
     // ── Contract-based notifications ─────────────────────────────────────────
     const semana = `${getISOWeekYear(hoje)}-W${getISOWeek(hoje)}`;
-    const porEmpresa7d  = new Map<string, number>();
+    const porEmpresa7d = new Map<string, number>();
     const porEmpresa30d = new Map<string, number>();
 
     for (const c of contratos) {
       if (c.encerrado) continue;
       const venc = startOfDay(parseISO(c.vencimentoSegundo));
       const dias = differenceInCalendarDays(venc, hoje);
-      const emp     = empresaMap.get(c.empresaId);
+      const emp = empresaMap.get(c.empresaId);
       const empNome = emp?.nomeFantasia ?? "Empresa";
       const rotaContrato = `/empresas/${c.empresaId}`;
 
@@ -83,8 +93,11 @@ export function useNotificacoes() {
           categoria: "vencido_nao_regularizado",
           titulo: `${c.funcionarioNome} — contrato VENCIDO`,
           descricao: `Venceu há ${Math.abs(dias)} ${Math.abs(dias) === 1 ? "dia" : "dias"} e não foi regularizado. ${empNome}`,
-          empresaId: c.empresaId, contratoId: c.id,
-          criadaEm: agora, rota: rotaContrato, rotaLabel: "Ver contrato",
+          empresaId: c.empresaId,
+          contratoId: c.id,
+          criadaEm: agora,
+          rota: rotaContrato,
+          rotaLabel: "Ver contrato",
         });
       } else if (dias <= 7) {
         push({
@@ -93,8 +106,11 @@ export function useNotificacoes() {
           categoria: "vencimento_iminente",
           titulo: `${c.funcionarioNome} — vence em ${dias === 0 ? "hoje" : `${dias} ${dias === 1 ? "dia" : "dias"}`}`,
           descricao: `${empNome} · ${c.cargo} · 2ª prorrogação`,
-          empresaId: c.empresaId, contratoId: c.id,
-          criadaEm: agora, rota: rotaContrato, rotaLabel: "Ver contrato",
+          empresaId: c.empresaId,
+          contratoId: c.id,
+          criadaEm: agora,
+          rota: rotaContrato,
+          rotaLabel: "Ver contrato",
         });
       } else if (dias <= 15) {
         push({
@@ -103,8 +119,11 @@ export function useNotificacoes() {
           categoria: "proximo_vencimento",
           titulo: `${c.funcionarioNome} — vence em ${dias} dias`,
           descricao: `Agende avaliação. ${empNome} · ${c.cargo}`,
-          empresaId: c.empresaId, contratoId: c.id,
-          criadaEm: agora, rota: rotaContrato, rotaLabel: "Ver contrato",
+          empresaId: c.empresaId,
+          contratoId: c.id,
+          criadaEm: agora,
+          rota: rotaContrato,
+          rotaLabel: "Ver contrato",
         });
       } else if (dias <= 30) {
         push({
@@ -113,13 +132,18 @@ export function useNotificacoes() {
           categoria: "janela_decisao",
           titulo: `${c.funcionarioNome} — vence em ${dias} dias`,
           descricao: `Defina se será efetivado ou encerrado. ${empNome}`,
-          empresaId: c.empresaId, contratoId: c.id,
-          criadaEm: agora, rota: rotaContrato, rotaLabel: "Ver contrato",
+          empresaId: c.empresaId,
+          contratoId: c.id,
+          criadaEm: agora,
+          rota: rotaContrato,
+          rotaLabel: "Ver contrato",
         });
       }
 
-      if (dias >= 0 && dias <= 7)  porEmpresa7d.set(c.empresaId,  (porEmpresa7d.get(c.empresaId)  ?? 0) + 1);
-      if (dias >= 0 && dias <= 30) porEmpresa30d.set(c.empresaId, (porEmpresa30d.get(c.empresaId) ?? 0) + 1);
+      if (dias >= 0 && dias <= 7)
+        porEmpresa7d.set(c.empresaId, (porEmpresa7d.get(c.empresaId) ?? 0) + 1);
+      if (dias >= 0 && dias <= 30)
+        porEmpresa30d.set(c.empresaId, (porEmpresa30d.get(c.empresaId) ?? 0) + 1);
     }
 
     // Batch by company — critical (≥3 in 7d)
@@ -132,8 +156,11 @@ export function useNotificacoes() {
         categoria: "lote_empresa_critico",
         titulo: `${emp?.nomeFantasia ?? "Empresa"} — ${n} contratos vencem esta semana`,
         descricao: "Ação imediata necessária para evitar passivo trabalhista",
-        empresaId: empId, contratoId: null,
-        criadaEm: agora, rota: `/empresas/${empId}`, rotaLabel: "Ver empresa",
+        empresaId: empId,
+        contratoId: null,
+        criadaEm: agora,
+        rota: `/empresas/${empId}`,
+        rotaLabel: "Ver empresa",
       });
     }
 
@@ -147,8 +174,11 @@ export function useNotificacoes() {
         categoria: "lote_empresa_atencao",
         titulo: `${emp?.nomeFantasia ?? "Empresa"} — ${n} contratos vencem nos próximos 30 dias`,
         descricao: "Planeje as avaliações com antecedência",
-        empresaId: empId, contratoId: null,
-        criadaEm: agora, rota: `/empresas/${empId}`, rotaLabel: "Ver empresa",
+        empresaId: empId,
+        contratoId: null,
+        criadaEm: agora,
+        rota: `/empresas/${empId}`,
+        rotaLabel: "Ver empresa",
       });
     }
 
@@ -165,7 +195,8 @@ export function useNotificacoes() {
         categoria: ev.tipo.toLowerCase(),
         titulo: meta.titulo(ev.descricao),
         descricao: `Registrado ${format(evAt, "HH:mm", { locale: ptBR })}`,
-        empresaId: null, contratoId: null,
+        empresaId: null,
+        contratoId: null,
         criadaEm: evAt,
         rota: meta.rota,
         rotaLabel: meta.rotaLabel,
@@ -173,7 +204,9 @@ export function useNotificacoes() {
     }
 
     // ── Daily summary (info) ──────────────────────────────────────────────────
-    let risco = 0, proximo = 0, vencido = 0;
+    let risco = 0,
+      proximo = 0,
+      vencido = 0;
     for (const c of contratos) {
       if (c.encerrado) continue;
       const dias = differenceInCalendarDays(startOfDay(parseISO(c.vencimentoSegundo)), hoje);
@@ -188,8 +221,11 @@ export function useNotificacoes() {
       categoria: "resumo_diario",
       titulo: `Resumo do dia — ${dataExtenso}`,
       descricao: `${risco} em risco · ${proximo} próximos do vencimento · ${vencido} vencidos`,
-      empresaId: null, contratoId: null,
-      criadaEm: agora, rota: "/", rotaLabel: "Ver dashboard",
+      empresaId: null,
+      contratoId: null,
+      criadaEm: agora,
+      rota: "/",
+      rotaLabel: "Ver dashboard",
     });
 
     // Sort: unread first (urgente > atencao > info), newest first; then read

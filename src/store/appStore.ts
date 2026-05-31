@@ -4,19 +4,32 @@ import { create } from "zustand";
 const NOTIF_KEY = "arbrent_notif_lidas";
 const loadNotifLidas = (): string[] => {
   if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem(NOTIF_KEY) ?? "[]"); } catch { return []; }
+  try {
+    return JSON.parse(localStorage.getItem(NOTIF_KEY) ?? "[]");
+  } catch {
+    return [];
+  }
 };
 const saveNotifLidas = (ids: string[]) => {
-  try { localStorage.setItem(NOTIF_KEY, JSON.stringify(ids)); } catch {}
+  try {
+    localStorage.setItem(NOTIF_KEY, JSON.stringify(ids));
+  } catch {}
 };
 
 export type HistoryEvent = {
   id: string;
   at: string;
   tipo:
-    | "EMPRESA_CRIADA" | "EMPRESA_EDITADA" | "EMPRESA_REMOVIDA" | "EMPRESA_ATIVADA" | "EMPRESA_DESATIVADA"
-    | "CONTRATO_ENCERRADO" | "CONTRATO_RENOVADO"
-    | "COLABORADOR_CRIADO" | "COLABORADOR_EDITADO" | "COLABORADOR_REMOVIDO";
+    | "EMPRESA_CRIADA"
+    | "EMPRESA_EDITADA"
+    | "EMPRESA_REMOVIDA"
+    | "EMPRESA_ATIVADA"
+    | "EMPRESA_DESATIVADA"
+    | "CONTRATO_ENCERRADO"
+    | "CONTRATO_RENOVADO"
+    | "COLABORADOR_CRIADO"
+    | "COLABORADOR_EDITADO"
+    | "COLABORADOR_REMOVIDO";
   descricao: string;
   contexto?: Record<string, string>;
 };

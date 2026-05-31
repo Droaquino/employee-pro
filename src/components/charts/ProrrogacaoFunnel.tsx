@@ -5,8 +5,12 @@ import type { Contrato } from "@/data/mock";
 export function ProrrogacaoFunnel({ contratos }: { contratos: Contrato[] }) {
   const primeira = contratos.filter((c) => !c.encerrado && c.prorrogacaoAtual === 1).length;
   const segunda = contratos.filter((c) => !c.encerrado && c.prorrogacaoAtual === 2).length;
-  const efetivados = contratos.filter((c) => c.encerrado && c.motivoEncerramento === "Efetivado").length;
-  const encerrados = contratos.filter((c) => c.encerrado && c.motivoEncerramento !== "Efetivado").length;
+  const efetivados = contratos.filter(
+    (c) => c.encerrado && c.motivoEncerramento === "Efetivado",
+  ).length;
+  const encerrados = contratos.filter(
+    (c) => c.encerrado && c.motivoEncerramento !== "Efetivado",
+  ).length;
 
   const data = [
     { name: "1ª prorrogação", value: primeira, fill: COLORS.brandAccent },
@@ -18,10 +22,25 @@ export function ProrrogacaoFunnel({ contratos }: { contratos: Contrato[] }) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <FunnelChart>
-        <Tooltip contentStyle={{ background: "#fff", border: `1px solid ${COLORS.borderSoft}`, borderRadius: 6, fontSize: 12 }} />
+        <Tooltip
+          contentStyle={{
+            background: "#fff",
+            border: `1px solid ${COLORS.borderSoft}`,
+            borderRadius: 6,
+            fontSize: 12,
+          }}
+        />
         <Funnel dataKey="value" data={data} isAnimationActive>
-          {data.map((d, i) => <Cell key={i} fill={d.fill} />)}
-          <LabelList position="right" fill={COLORS.textPrimary} stroke="none" dataKey="name" style={{ fontSize: 12 }} />
+          {data.map((d, i) => (
+            <Cell key={i} fill={d.fill} />
+          ))}
+          <LabelList
+            position="right"
+            fill={COLORS.textPrimary}
+            stroke="none"
+            dataKey="name"
+            style={{ fontSize: 12 }}
+          />
         </Funnel>
       </FunnelChart>
     </ResponsiveContainer>

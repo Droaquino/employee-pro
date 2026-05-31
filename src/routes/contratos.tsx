@@ -7,7 +7,13 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { useEmpresas } from "@/hooks/useEmpresas";
 import { useContratos } from "@/hooks/useContratos";
 import { ContratosTable } from "@/components/ContratosTable";
-import { ContratosFilters, applyFilters, hasActiveFilters, initialFilters, type FiltersState } from "@/components/ContratosFilters";
+import {
+  ContratosFilters,
+  applyFilters,
+  hasActiveFilters,
+  initialFilters,
+  type FiltersState,
+} from "@/components/ContratosFilters";
 import { calcStatus } from "@/hooks/useStatusContrato";
 import { STATUS_LABEL } from "@/constants/colors";
 import { csvDateStamp, downloadCsv, toCsv } from "@/lib/csv";
@@ -42,22 +48,43 @@ function ContratosPage() {
 
   const persist = (nextEmpresaId: string, nextFilters: FiltersState) => {
     try {
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify({ empresaId: nextEmpresaId, filters: nextFilters }));
+      sessionStorage.setItem(
+        SESSION_KEY,
+        JSON.stringify({ empresaId: nextEmpresaId, filters: nextFilters }),
+      );
     } catch {}
   };
 
-  const handleEmpresaChange = (id: string) => { setEmpresaId(id); persist(id, filters); };
-  const handleFiltersChange = (next: FiltersState) => { setFilters(next); persist(empresaId, next); };
-  const handleClearAll = () => { setFilters(initialFilters); setEmpresaId(""); persist("", initialFilters); };
+  const handleEmpresaChange = (id: string) => {
+    setEmpresaId(id);
+    persist(id, filters);
+  };
+  const handleFiltersChange = (next: FiltersState) => {
+    setFilters(next);
+    persist(empresaId, next);
+  };
+  const handleClearAll = () => {
+    setFilters(initialFilters);
+    setEmpresaId("");
+    persist("", initialFilters);
+  };
 
-  const base = useMemo(() => empresaId ? contratos.filter((c) => c.empresaId === empresaId) : contratos, [contratos, empresaId]);
+  const base = useMemo(
+    () => (empresaId ? contratos.filter((c) => c.empresaId === empresaId) : contratos),
+    [contratos, empresaId],
+  );
   const filtered = useMemo(() => applyFilters(base, filters), [base, filters]);
-  const empresaMap = useMemo(() => new Map(empresas.map((e) => [e.id, e.nomeFantasia])), [empresas]);
+  const empresaMap = useMemo(
+    () => new Map(empresas.map((e) => [e.id, e.nomeFantasia])),
+    [empresas],
+  );
 
   // Contagens para chips de filtro rápido
   const chipCounts = useMemo(() => {
     const hoje = startOfDay(new Date());
-    let hoje_ = 0, semana = 0, risco = 0;
+    let hoje_ = 0,
+      semana = 0,
+      risco = 0;
     for (const c of base) {
       if (c.encerrado) continue;
       const dias = differenceInCalendarDays(startOfDay(parseISO(c.vencimentoSegundo)), hoje);
@@ -69,7 +96,10 @@ function ContratosPage() {
   }, [base]);
 
   const handleExport = () => {
-    if (filtered.length === 0) { toast.error("Nada para exportar"); return; }
+    if (filtered.length === 0) {
+      toast.error("Nada para exportar");
+      return;
+    }
     const rows = filtered.map((c) => {
       const info = calcStatus(c);
       return {
@@ -97,13 +127,37 @@ function ContratosPage() {
     if (chip === "semana") handleFiltersChange({ ...initialFilters, status: "RISCO" });
     if (chip === "risco") handleFiltersChange({ ...initialFilters, status: "RISCO" });
     // Scroll suave para a tabela
-    setTimeout(() => document.getElementById("contratos-table")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+    setTimeout(
+      () =>
+        document
+          .getElementById("contratos-table")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+      50,
+    );
   };
 
   const chips = [
-    { key: "hoje" as const,  label: "Vence hoje",    count: chipCounts.hoje,  color: "#7f1d1d", bg: "#fef2f2" },
-    { key: "semana" as const, label: "Esta semana",  count: chipCounts.semana, color: "#dc2626", bg: "#fef2f2" },
-    { key: "risco" as const,  label: "Em risco",     count: chipCounts.risco,  color: "#d97706", bg: "#fffbeb" },
+    {
+      key: "hoje" as const,
+      label: "Vence hoje",
+      count: chipCounts.hoje,
+      color: "#7f1d1d",
+      bg: "#fef2f2",
+    },
+    {
+      key: "semana" as const,
+      label: "Esta semana",
+      count: chipCounts.semana,
+      color: "#dc2626",
+      bg: "#fef2f2",
+    },
+    {
+      key: "risco" as const,
+      label: "Em risco",
+      count: chipCounts.risco,
+      color: "#d97706",
+      bg: "#fffbeb",
+    },
   ];
 
   return (
@@ -113,7 +167,11 @@ function ContratosPage() {
         title="Contratos"
         subtitle="Todos os contratos de experiência da carteira."
         right={
-          <button onClick={handleExport} className="px-4 py-2 rounded-md text-[13px] font-medium text-white" style={{ background: "#071040" }}>
+          <button
+            onClick={handleExport}
+            className="px-4 py-2 rounded-md text-[13px] font-medium text-white"
+            style={{ background: "#071040" }}
+          >
             Exportar CSV
           </button>
         }
@@ -137,7 +195,8 @@ function ContratosPage() {
             <span
               className="inline-flex items-center justify-center rounded-full text-[10px] font-bold text-white"
               style={{
-                width: 18, height: 18,
+                width: 18,
+                height: 18,
                 background: chip.count > 0 ? chip.color : "#cbd5e1",
                 minWidth: 18,
               }}
@@ -163,7 +222,11 @@ function ContratosPage() {
             style={{ border: "1px solid #e2e5f0", background: "#fff" }}
           >
             <option value="">Todas as empresas</option>
-            {empresas.map((e) => <option key={e.id} value={e.id}>{e.nomeFantasia}</option>)}
+            {empresas.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.nomeFantasia}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -177,7 +240,8 @@ function ContratosPage() {
 
         <div className="flex items-center gap-3 mb-2">
           <span className="text-[12px]" style={{ color: "#64748b" }}>
-            Exibindo <strong style={{ color: "#0f172a" }}>{filtered.length}</strong> de {base.length} contratos
+            Exibindo <strong style={{ color: "#0f172a" }}>{filtered.length}</strong> de{" "}
+            {base.length} contratos
           </span>
           {anyFilter && (
             <button

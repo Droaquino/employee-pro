@@ -39,7 +39,10 @@ type Props = {
 };
 
 export function ContratosFilters({ contratos, total, filtered, value, onChange }: Props) {
-  const cargos = useMemo(() => Array.from(new Set(contratos.map((c) => c.cargo))).sort(), [contratos]);
+  const cargos = useMemo(
+    () => Array.from(new Set(contratos.map((c) => c.cargo))).sort(),
+    [contratos],
+  );
   const active = hasActiveFilters(value);
   const statusOpts: StatusFilter[] = ["TODOS", "VIGENTE", "PROXIMO", "RISCO", "VENCIDO"];
 
@@ -62,7 +65,11 @@ export function ContratosFilters({ contratos, total, filtered, value, onChange }
           style={{ border: "1px solid #e2e5f0", background: "#fff" }}
         >
           <option value="">Todos os cargos</option>
-          {cargos.map((c) => <option key={c} value={c}>{c}</option>)}
+          {cargos.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
         </select>
         <span className="text-[12px]" style={{ color: "#64748b" }}>
           Exibindo <strong style={{ color: "#0f172a" }}>{filtered}</strong> de {total} contratos

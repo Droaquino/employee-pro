@@ -28,7 +28,8 @@ function EmRisco() {
   });
 
   useEffect(() => {
-    document.title = contratos.length > 0 ? `⚠ ${contratos.length} em risco · Arbrent` : "Em risco · Arbrent";
+    document.title =
+      contratos.length > 0 ? `⚠ ${contratos.length} em risco · Arbrent` : "Em risco · Arbrent";
   }, [contratos.length]);
 
   return (

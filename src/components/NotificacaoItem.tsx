@@ -46,8 +46,12 @@ export function NotificacaoItem({ n, onClick }: Props) {
         borderBottom: `1px solid ${COLORS.bgPage}`,
         opacity: n.lida ? 0.75 : 1,
       }}
-      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "#f8f9ff"; }}
-      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = n.lida ? COLORS.surface : "#f0f4ff"; }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLElement).style.background = "#f8f9ff";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLElement).style.background = n.lida ? COLORS.surface : "#f0f4ff";
+      }}
     >
       <div className="flex items-start gap-2">
         <span
@@ -60,7 +64,9 @@ export function NotificacaoItem({ n, onClick }: Props) {
             <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: cor }}>
               {TIPO_LABEL[n.tipo]}
             </span>
-            <span className="text-[11px]" style={{ color: "#8fa3cc" }}>{horaLabel}</span>
+            <span className="text-[11px]" style={{ color: "#8fa3cc" }}>
+              {horaLabel}
+            </span>
           </div>
           <div className="text-[13px] font-semibold mt-0.5" style={{ color: COLORS.textPrimary }}>
             {n.titulo}

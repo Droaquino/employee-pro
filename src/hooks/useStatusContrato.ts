@@ -28,7 +28,13 @@ export function calcStatus(contrato: Contrato): StatusInfo {
   }
 
   const urgencia =
-    status === "VENCIDO" ? 1000 - dias : status === "RISCO" ? 500 - dias : status === "PROXIMO" ? 100 - dias : -dias;
+    status === "VENCIDO"
+      ? 1000 - dias
+      : status === "RISCO"
+        ? 500 - dias
+        : status === "PROXIMO"
+          ? 100 - dias
+          : -dias;
 
   return { status, diasRestantes: dias, urgencia };
 }

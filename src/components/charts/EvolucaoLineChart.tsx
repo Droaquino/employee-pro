@@ -1,4 +1,14 @@
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend, ReferenceLine } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  Legend,
+  ReferenceLine,
+} from "recharts";
 import { addMonths, format, isAfter, isBefore, parseISO, startOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { COLORS } from "@/constants/colors";
@@ -30,11 +40,37 @@ export function EvolucaoLineChart({ contratos }: { contratos: Contrato[] }) {
         <CartesianGrid stroke={COLORS.borderSoft} vertical={false} />
         <XAxis dataKey="mes" tick={{ fontSize: 11, fill: COLORS.textMuted }} />
         <YAxis tick={{ fontSize: 11, fill: COLORS.textMuted }} allowDecimals={false} />
-        <Tooltip contentStyle={{ background: "#fff", border: `1px solid ${COLORS.borderSoft}`, borderRadius: 6, fontSize: 12 }} />
+        <Tooltip
+          contentStyle={{
+            background: "#fff",
+            border: `1px solid ${COLORS.borderSoft}`,
+            borderRadius: 6,
+            fontSize: 12,
+          }}
+        />
         <Legend wrapperStyle={{ fontSize: 11 }} />
-        <ReferenceLine x={format(now, "MMM/yy", { locale: ptBR })} stroke={COLORS.brandAccent} strokeDasharray="3 3" />
-        <Line type="monotone" dataKey="ativos" name="Contratos ativos" stroke={COLORS.brand} strokeWidth={2.5} dot={{ r: 3 }} />
-        <Line type="monotone" dataKey="projecao" name="Projeção" stroke={COLORS.brandAccent} strokeWidth={2} strokeDasharray="5 5" dot={{ r: 3 }} />
+        <ReferenceLine
+          x={format(now, "MMM/yy", { locale: ptBR })}
+          stroke={COLORS.brandAccent}
+          strokeDasharray="3 3"
+        />
+        <Line
+          type="monotone"
+          dataKey="ativos"
+          name="Contratos ativos"
+          stroke={COLORS.brand}
+          strokeWidth={2.5}
+          dot={{ r: 3 }}
+        />
+        <Line
+          type="monotone"
+          dataKey="projecao"
+          name="Projeção"
+          stroke={COLORS.brandAccent}
+          strokeWidth={2}
+          strokeDasharray="5 5"
+          dot={{ r: 3 }}
+        />
       </LineChart>
     </ResponsiveContainer>
   );

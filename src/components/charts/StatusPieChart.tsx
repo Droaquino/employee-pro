@@ -15,7 +15,14 @@ export function StatusPieChart({ contratos }: { contratos: Contrato[] }) {
     .map(([k, v]) => ({ name: STATUS_LABEL[k], value: v, key: k }));
 
   if (data.length === 0) {
-    return <div className="h-[300px] flex items-center justify-center text-[12px]" style={{ color: COLORS.textMuted }}>Sem dados para exibir</div>;
+    return (
+      <div
+        className="h-[300px] flex items-center justify-center text-[12px]"
+        style={{ color: COLORS.textMuted }}
+      >
+        Sem dados para exibir
+      </div>
+    );
   }
   return (
     <div>
@@ -31,13 +38,22 @@ export function StatusPieChart({ contratos }: { contratos: Contrato[] }) {
               `${value} contrato${value !== 1 ? "s" : ""} (${((value / total) * 100).toFixed(0)}% da carteira)`,
               name,
             ]}
-            contentStyle={{ background: "#fff", border: `1px solid ${COLORS.borderSoft}`, borderRadius: 6, fontSize: 12 }}
+            contentStyle={{
+              background: "#fff",
+              border: `1px solid ${COLORS.borderSoft}`,
+              borderRadius: 6,
+              fontSize: 12,
+            }}
           />
         </PieChart>
       </ResponsiveContainer>
       <div className="flex flex-wrap gap-3 justify-center mt-2">
         {data.map((d) => (
-          <div key={d.key} className="flex items-center gap-2 text-[12px]" style={{ color: COLORS.textPrimary }}>
+          <div
+            key={d.key}
+            className="flex items-center gap-2 text-[12px]"
+            style={{ color: COLORS.textPrimary }}
+          >
             <span className="w-3 h-3 rounded-sm" style={{ background: STATUS_COLOR[d.key] }} />
             <span>{d.name}</span>
             <span style={{ color: COLORS.textMuted }}>· {d.value}</span>

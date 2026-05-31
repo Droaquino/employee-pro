@@ -6,7 +6,14 @@ import { COLORS } from "@/constants/colors";
 import { useEmpresas } from "@/hooks/useEmpresas";
 import { useContratos } from "@/hooks/useContratos";
 
-type Cell = { empresaId: string; weekIdx: number; count: number; weekStart: Date; weekEnd: Date; empresaNome: string };
+type Cell = {
+  empresaId: string;
+  weekIdx: number;
+  count: number;
+  weekStart: Date;
+  weekEnd: Date;
+  empresaNome: string;
+};
 
 function cellColor(n: number) {
   if (n === 0) return { bg: "#f0f4ff", fg: "#94a3b8" };
@@ -57,7 +64,10 @@ export function HeatmapVencimentos() {
 
   if (rows.length === 0) {
     return (
-      <div className="h-[200px] flex items-center justify-center text-[12px]" style={{ color: COLORS.textMuted }}>
+      <div
+        className="h-[200px] flex items-center justify-center text-[12px]"
+        style={{ color: COLORS.textMuted }}
+      >
         Nenhum vencimento nos próximos 3 meses.
       </div>
     );
@@ -148,7 +158,11 @@ export function HeatmapVencimentos() {
                   title={tip}
                   aria-label={tip}
                   className="h-7 rounded-sm flex items-center justify-center text-[11px] font-semibold transition-transform hover:scale-110 disabled:cursor-default disabled:hover:scale-100"
-                  style={{ background: bg, color: fg, cursor: cell.count > 0 ? "pointer" : "default" }}
+                  style={{
+                    background: bg,
+                    color: fg,
+                    cursor: cell.count > 0 ? "pointer" : "default",
+                  }}
                 >
                   {cell.count > 0 ? cell.count : ""}
                 </button>
@@ -158,7 +172,10 @@ export function HeatmapVencimentos() {
         ))}
 
         {/* Legend */}
-        <div className="flex items-center gap-3 mt-4 text-[11px]" style={{ color: COLORS.textMuted }}>
+        <div
+          className="flex items-center gap-3 mt-4 text-[11px]"
+          style={{ color: COLORS.textMuted }}
+        >
           <span>Intensidade:</span>
           {[
             { label: "0", bg: "#f0f4ff" },

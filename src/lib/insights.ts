@@ -12,17 +12,30 @@ export function insightStatus(contratos: Contrato[]): Insight {
   const counts = { VIGENTE: 0, PROXIMO: 0, RISCO: 0, VENCIDO: 0 };
   for (const c of ativos) counts[calcStatus(c).status]++;
   if (counts.VENCIDO > 0)
-    return { tone: "critico", texto: `${counts.VENCIDO} contrato(s) vencido(s) — regularize hoje para evitar efetivação automática.` };
+    return {
+      tone: "critico",
+      texto: `${counts.VENCIDO} contrato(s) vencido(s) — regularize hoje para evitar efetivação automática.`,
+    };
   if (counts.RISCO > 0)
-    return { tone: "critico", texto: `${counts.RISCO} contrato(s) em risco (≤15 dias). Decida prorrogar ou encerrar nesta semana.` };
+    return {
+      tone: "critico",
+      texto: `${counts.RISCO} contrato(s) em risco (≤15 dias). Decida prorrogar ou encerrar nesta semana.`,
+    };
   if (counts.PROXIMO > 0)
-    return { tone: "atencao", texto: `${counts.PROXIMO} contrato(s) próximos do vencimento (16–30 dias). Agende avaliação.` };
-  return { tone: "ok", texto: `Carteira saudável: ${counts.VIGENTE} vigente(s), sem riscos imediatos.` };
+    return {
+      tone: "atencao",
+      texto: `${counts.PROXIMO} contrato(s) próximos do vencimento (16–30 dias). Agende avaliação.`,
+    };
+  return {
+    tone: "ok",
+    texto: `Carteira saudável: ${counts.VIGENTE} vigente(s), sem riscos imediatos.`,
+  };
 }
 
 export function insightEmpresas(empresas: Empresa[], contratos: Contrato[]): Insight {
   const ativos = contratos.filter((c) => !c.encerrado);
-  if (ativos.length === 0) return { tone: "neutro", texto: "Sem contratos ativos para distribuir entre empresas." };
+  if (ativos.length === 0)
+    return { tone: "neutro", texto: "Sem contratos ativos para distribuir entre empresas." };
   const porEmpresa = empresas.map((e) => {
     const list = ativos.filter((c) => c.empresaId === e.id);
     const risco = list.filter((c) => {
@@ -55,7 +68,8 @@ export function insightVencimentos(contratos: Contrato[]): Insight {
     let seg = 0;
     for (const c of contratos) {
       if (c.encerrado) continue;
-      if (format(parseISO(c.vencimentoPrimeiro), "yyyy-MM") === key && c.prorrogacaoAtual === 1) prim++;
+      if (format(parseISO(c.vencimentoPrimeiro), "yyyy-MM") === key && c.prorrogacaoAtual === 1)
+        prim++;
       if (format(parseISO(c.vencimentoSegundo), "yyyy-MM") === key) seg++;
     }
     return { mes: format(m, "MMMM", { locale: ptBR }), total: prim + seg, seg };
@@ -94,7 +108,8 @@ export function insightHeatmap(empresas: Empresa[], contratos: Contrato[]): Insi
     const v = parseISO(c.vencimentoSegundo);
     return v >= now && v <= limit;
   });
-  if (noPeriodo.length === 0) return { tone: "ok", texto: "Sem vencimentos nas próximas 12 semanas." };
+  if (noPeriodo.length === 0)
+    return { tone: "ok", texto: "Sem vencimentos nas próximas 12 semanas." };
 
   // semana com mais vencimentos por empresa
   const porSemanaEmpresa = new Map<string, number>();
@@ -106,9 +121,16 @@ export function insightHeatmap(empresas: Empresa[], contratos: Contrato[]): Insi
   }
   let topKey = "";
   let topCount = 0;
-  for (const [k, v] of porSemanaEmpresa) if (v > topCount) { topCount = v; topKey = k; }
+  for (const [k, v] of porSemanaEmpresa)
+    if (v > topCount) {
+      topCount = v;
+      topKey = k;
+    }
   if (topCount <= 1) {
-    return { tone: "neutro", texto: `${noPeriodo.length} vencimento(s) distribuídos nas próximas 12 semanas — sem concentração relevante.` };
+    return {
+      tone: "neutro",
+      texto: `${noPeriodo.length} vencimento(s) distribuídos nas próximas 12 semanas — sem concentração relevante.`,
+    };
   }
   const [eid, sIdx] = topKey.split("|");
   const emp = empresas.find((e) => e.id === eid)?.nomeFantasia ?? "Empresa";

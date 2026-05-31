@@ -21,7 +21,8 @@ function maskTelefone(value: string): string {
   const digits = value.replace(/\D/g, "").slice(0, 11);
   if (digits.length <= 2) return digits.length ? `(${digits}` : "";
   if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  if (digits.length <= 10)
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
   return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
 }
 
@@ -76,21 +77,31 @@ export function ColaboradorForm({ open, initial, empresaId, onClose, onSave }: P
       <div
         onClick={onClose}
         style={{
-          position: "fixed", inset: 0, background: "rgba(7,16,64,0.35)",
-          opacity: open ? 1 : 0, pointerEvents: open ? "auto" : "none",
-          transition: "opacity .2s", zIndex: 40,
+          position: "fixed",
+          inset: 0,
+          background: "rgba(7,16,64,0.35)",
+          opacity: open ? 1 : 0,
+          pointerEvents: open ? "auto" : "none",
+          transition: "opacity .2s",
+          zIndex: 40,
         }}
       />
 
       {/* Drawer */}
       <div
         style={{
-          position: "fixed", top: 0, right: 0, height: "100vh", width: 440,
+          position: "fixed",
+          top: 0,
+          right: 0,
+          height: "100vh",
+          width: 440,
           background: "#fff",
           transform: open ? "translateX(0)" : "translateX(100%)",
           transition: "transform .25s ease",
-          boxShadow: "-8px 0 24px rgba(7,16,64,0.12)", zIndex: 50,
-          display: "flex", flexDirection: "column",
+          boxShadow: "-8px 0 24px rgba(7,16,64,0.12)",
+          zIndex: 50,
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         {/* Header */}
@@ -99,14 +110,19 @@ export function ColaboradorForm({ open, initial, empresaId, onClose, onSave }: P
             {initial ? "Editar colaborador" : "Novo colaborador"}
           </h2>
           <p className="text-[12px] mt-0.5" style={{ color: "#64748b" }}>
-            {initial ? "Atualize os dados do colaborador." : "Cadastre um colaborador para esta empresa."}
+            {initial
+              ? "Atualize os dados do colaborador."
+              : "Cadastre um colaborador para esta empresa."}
           </p>
         </header>
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
           {/* Nome */}
-          <Field label="Nome completo *" error={form.nome.trim().length > 0 && errors.nome ? "Mínimo 2 caracteres" : ""}>
+          <Field
+            label="Nome completo *"
+            error={form.nome.trim().length > 0 && errors.nome ? "Mínimo 2 caracteres" : ""}
+          >
             <input
               className={inputCls}
               style={inputStyle(form.nome.trim().length > 0 && errors.nome)}
@@ -129,7 +145,10 @@ export function ColaboradorForm({ open, initial, empresaId, onClose, onSave }: P
           </Field>
 
           {/* Cargo */}
-          <Field label="Cargo *" error={form.cargo.trim().length > 0 && errors.cargo ? "Obrigatório" : ""}>
+          <Field
+            label="Cargo *"
+            error={form.cargo.trim().length > 0 && errors.cargo ? "Obrigatório" : ""}
+          >
             <input
               className={inputCls}
               style={inputStyle(form.cargo.trim().length > 0 && errors.cargo)}
@@ -169,7 +188,14 @@ export function ColaboradorForm({ open, initial, empresaId, onClose, onSave }: P
               className={inputCls}
               style={inputStyle(false)}
               value={form.prazoRenovacao ?? ""}
-              onChange={(e) => setForm({ ...form, prazoRenovacao: e.target.value ? Number(e.target.value) as 30 | 45 | 60 | 90 : undefined })}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  prazoRenovacao: e.target.value
+                    ? (Number(e.target.value) as 30 | 45 | 60 | 90)
+                    : undefined,
+                })
+              }
             >
               <option value="">Não definido</option>
               <option value="30">30 dias</option>
@@ -198,18 +224,24 @@ export function ColaboradorForm({ open, initial, empresaId, onClose, onSave }: P
               type="button"
               onClick={() => setForm({ ...form, ativo: !form.ativo })}
               style={{
-                width: 36, height: 20, borderRadius: 999,
+                width: 36,
+                height: 20,
+                borderRadius: 999,
                 background: form.ativo ? "#22c55e" : "#cbd5e1",
-                position: "relative", transition: "background .15s",
+                position: "relative",
+                transition: "background .15s",
                 flexShrink: 0,
               }}
             >
               <span
                 style={{
-                  position: "absolute", top: 2,
+                  position: "absolute",
+                  top: 2,
                   left: form.ativo ? 18 : 2,
-                  width: 16, height: 16,
-                  borderRadius: 999, background: "#fff",
+                  width: 16,
+                  height: 16,
+                  borderRadius: 999,
+                  background: "#fff",
                   transition: "left .15s",
                 }}
               />
@@ -219,7 +251,10 @@ export function ColaboradorForm({ open, initial, empresaId, onClose, onSave }: P
         </div>
 
         {/* Footer */}
-        <footer className="px-6 py-4 border-t flex items-center justify-end gap-2" style={{ borderColor: "#e2e5f0" }}>
+        <footer
+          className="px-6 py-4 border-t flex items-center justify-end gap-2"
+          style={{ borderColor: "#e2e5f0" }}
+        >
           <button
             onClick={onClose}
             className="px-3 py-2 rounded-md text-[13px]"

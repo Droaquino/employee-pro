@@ -1,9 +1,25 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine, Cell } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  ReferenceLine,
+  Cell,
+} from "recharts";
 import { COLORS, STATUS_COLOR } from "@/constants/colors";
 import type { Contrato, Empresa } from "@/data/mock";
 import { calcStatus } from "@/hooks/useStatusContrato";
 
-export function RiscoBarChart({ contratos, empresas }: { contratos: Contrato[]; empresas: Empresa[] }) {
+export function RiscoBarChart({
+  contratos,
+  empresas,
+}: {
+  contratos: Contrato[];
+  empresas: Empresa[];
+}) {
   const empMap = new Map(empresas.map((e) => [e.id, e.nomeFantasia]));
   const data = contratos
     .filter((c) => !c.encerrado)
@@ -24,9 +40,25 @@ export function RiscoBarChart({ contratos, empresas }: { contratos: Contrato[]; 
     <ResponsiveContainer width="100%" height={Math.max(320, data.length * 24)}>
       <BarChart data={data} layout="vertical" margin={{ top: 8, right: 24, bottom: 4, left: 10 }}>
         <CartesianGrid stroke={COLORS.borderSoft} horizontal={false} />
-        <XAxis type="number" tick={{ fontSize: 11, fill: COLORS.textMuted }} tickFormatter={(v) => `${v}d`} />
-        <YAxis dataKey="label" type="category" width={180} tick={{ fontSize: 11, fill: COLORS.textPrimary }} />
-        <Tooltip contentStyle={{ background: "#fff", border: `1px solid ${COLORS.borderSoft}`, borderRadius: 6, fontSize: 12 }} />
+        <XAxis
+          type="number"
+          tick={{ fontSize: 11, fill: COLORS.textMuted }}
+          tickFormatter={(v) => `${v}d`}
+        />
+        <YAxis
+          dataKey="label"
+          type="category"
+          width={180}
+          tick={{ fontSize: 11, fill: COLORS.textPrimary }}
+        />
+        <Tooltip
+          contentStyle={{
+            background: "#fff",
+            border: `1px solid ${COLORS.borderSoft}`,
+            borderRadius: 6,
+            fontSize: 12,
+          }}
+        />
         <ReferenceLine x={0} stroke={COLORS.brand} />
         <Bar dataKey="dias" radius={[3, 3, 3, 3]}>
           {data.map((d, i) => (

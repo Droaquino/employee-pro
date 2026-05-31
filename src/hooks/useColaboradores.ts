@@ -66,10 +66,7 @@ export function useRemoveColaborador() {
 
   return useMutation({
     mutationFn: async (colaborador: Colaborador) => {
-      const { error } = await supabase
-        .from("colaboradores")
-        .delete()
-        .eq("id", colaborador.id);
+      const { error } = await supabase.from("colaboradores").delete().eq("id", colaborador.id);
       if (error) throw error;
     },
     onSuccess: async (_, colaborador) => {
@@ -89,10 +86,7 @@ export function useToggleAtivoColaborador() {
 
   return useMutation({
     mutationFn: async ({ id, ativo }: { id: string; ativo: boolean }) => {
-      const { error } = await supabase
-        .from("colaboradores")
-        .update({ ativo })
-        .eq("id", id);
+      const { error } = await supabase.from("colaboradores").update({ ativo }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: COLABORADORES_KEY }),

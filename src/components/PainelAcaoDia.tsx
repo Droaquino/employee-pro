@@ -11,7 +11,10 @@ function useCountUp(target: number, duration = 700) {
   const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (target === 0) { setValue(0); return; }
+    if (target === 0) {
+      setValue(0);
+      return;
+    }
     const start = performance.now();
     const animate = (now: number) => {
       const elapsed = now - start;
@@ -22,7 +25,9 @@ function useCountUp(target: number, duration = 700) {
       if (progress < 1) rafRef.current = requestAnimationFrame(animate);
     };
     rafRef.current = requestAnimationFrame(animate);
-    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
   }, [target, duration]);
 
   return value;
@@ -102,14 +107,26 @@ export function PainelAcaoDia() {
 }
 
 function Item({
-  dot, number, label, ctaLabel, to,
+  dot,
+  number,
+  label,
+  ctaLabel,
+  to,
 }: {
-  dot: string; number: number; label: string; ctaLabel: string; to: string;
+  dot: string;
+  number: number;
+  label: string;
+  ctaLabel: string;
+  to: string;
 }) {
   const animated = useCountUp(number);
   return (
     <div className="flex items-center gap-3">
-      <span aria-hidden className="inline-block rounded-full shrink-0" style={{ background: dot, width: 10, height: 10 }} />
+      <span
+        aria-hidden
+        className="inline-block rounded-full shrink-0"
+        style={{ background: dot, width: 10, height: 10 }}
+      />
       <div className="flex items-baseline gap-2 flex-wrap">
         <span
           className="font-bold tabular-nums"

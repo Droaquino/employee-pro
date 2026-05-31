@@ -17,7 +17,14 @@ export function Vencimentos30DiasChart({ contratos }: { contratos: Contrato[] })
   });
 
   if (data.every((d) => d.qt === 0)) {
-    return <div className="h-[220px] flex items-center justify-center text-[12px]" style={{ color: COLORS.textMuted }}>Sem vencimentos nos próximos 30 dias</div>;
+    return (
+      <div
+        className="h-[220px] flex items-center justify-center text-[12px]"
+        style={{ color: COLORS.textMuted }}
+      >
+        Sem vencimentos nos próximos 30 dias
+      </div>
+    );
   }
 
   return (
@@ -26,7 +33,14 @@ export function Vencimentos30DiasChart({ contratos }: { contratos: Contrato[] })
         <CartesianGrid stroke={COLORS.borderSoft} vertical={false} />
         <XAxis dataKey="dia" tick={{ fontSize: 10, fill: COLORS.textMuted }} interval={1} />
         <YAxis tick={{ fontSize: 11, fill: COLORS.textMuted }} allowDecimals={false} />
-        <Tooltip contentStyle={{ background: "#fff", border: `1px solid ${COLORS.borderSoft}`, borderRadius: 6, fontSize: 12 }} />
+        <Tooltip
+          contentStyle={{
+            background: "#fff",
+            border: `1px solid ${COLORS.borderSoft}`,
+            borderRadius: 6,
+            fontSize: 12,
+          }}
+        />
         <Bar dataKey="qt" name="Vencimentos" fill={COLORS.brandAccent} radius={[3, 3, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>

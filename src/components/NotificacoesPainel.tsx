@@ -14,14 +14,14 @@ type Props = {
 };
 
 const FILTROS: { key: FiltroNotif; label: string; cor: string }[] = [
-  { key: "todos",   label: "Todos",   cor: COLORS.brand },
+  { key: "todos", label: "Todos", cor: COLORS.brand },
   { key: "urgente", label: "Urgente", cor: COLORS.risco },
   { key: "atencao", label: "Atenção", cor: COLORS.proximo },
-  { key: "info",    label: "Info",    cor: COLORS.brandAccent },
+  { key: "info", label: "Info", cor: COLORS.brandAccent },
 ];
 
 function grupo(d: Date): "HOJE" | "ONTEM" | "ESTA SEMANA" | "MAIS ANTIGAS" {
-  if (isToday(d))    return "HOJE";
+  if (isToday(d)) return "HOJE";
   if (isYesterday(d)) return "ONTEM";
   if (isThisWeek(d, { locale: ptBR })) return "ESTA SEMANA";
   return "MAIS ANTIGAS";
@@ -35,14 +35,16 @@ export function NotificacoesPainel({ open, onClose, returnFocusRef }: Props) {
   const [filtro, setFiltro] = useState<FiltroNotif>("todos");
 
   const notificacoesFiltradas = useMemo(
-    () => filtro === "todos" ? notificacoes : notificacoes.filter((n) => n.tipo === filtro),
+    () => (filtro === "todos" ? notificacoes : notificacoes.filter((n) => n.tipo === filtro)),
     [notificacoes, filtro],
   );
 
   // ESC to close + focus management
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
     window.addEventListener("keydown", onKey);
     closeBtnRef.current?.focus();
     return () => {
@@ -185,7 +187,16 @@ export function NotificacoesPainel({ open, onClose, returnFocusRef }: Props) {
 
 function BellIcon({ size = 20 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
       <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
     </svg>
@@ -193,14 +204,32 @@ function BellIcon({ size = 20 }: { size?: number }) {
 }
 function XIcon({ size = 18 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M18 6L6 18M6 6l12 12" />
     </svg>
   );
 }
 function BellOffIcon({ size = 24, color = "currentColor" }: { size?: number; color?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M8.7 3.3A6 6 0 0 1 18 8c0 3 .8 5.2 1.7 6.7M6.4 6.4A6 6 0 0 0 6 8c0 7-3 9-3 9h14M10.3 21a1.94 1.94 0 0 0 3.4 0M2 2l20 20" />
     </svg>
   );

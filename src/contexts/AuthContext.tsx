@@ -15,11 +15,7 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 async function fetchProfile(userId: string): Promise<ProfileRow | null> {
-  const { data } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", userId)
-    .single();
+  const { data } = await supabase.from("profiles").select("*").eq("id", userId).single();
   return data as ProfileRow | null;
 }
 
@@ -40,17 +36,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     // Mudanças de auth em tempo real
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        if (session?.user) {
-          const p = await fetchProfile(session.user.id);
-          setProfile(p);
-        } else {
-          setProfile(null);
-        }
-      },
-    );
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setSession(session);
+      if (session?.user) {
+        const p = await fetchProfile(session.user.id);
+        setProfile(p);
+      } else {
+        setProfile(null);
+      }
+    });
 
     return () => subscription.unsubscribe();
   }, []);

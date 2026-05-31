@@ -136,7 +136,11 @@ function ToggleFilter({
     <button
       onClick={onClick}
       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-medium transition-all"
-      style={{ background: bg, color: text, border: `1px solid ${active ? (color ?? "#071040") : "#e2e5f0"}` }}
+      style={{
+        background: bg,
+        color: text,
+        border: `1px solid ${active ? (color ?? "#071040") : "#e2e5f0"}`,
+      }}
     >
       {color && (
         <span
@@ -149,15 +153,7 @@ function ToggleFilter({
   );
 }
 
-function Avatar({
-  name,
-  color,
-  size = 36,
-}: {
-  name: string;
-  color: string;
-  size?: number;
-}) {
+function Avatar({ name, color, size = 36 }: { name: string; color: string; size?: number }) {
   return (
     <div
       className="rounded-full flex items-center justify-center font-semibold text-white flex-shrink-0"
@@ -175,7 +171,7 @@ function StatusBadge({ status }: { status: string }) {
       ? "Em risco"
       : status === "PROXIMO"
         ? "Próximo"
-        : STATUS_LABEL[status] ?? status;
+        : (STATUS_LABEL[status] ?? status);
   return (
     <span
       className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold flex-shrink-0"
@@ -187,15 +183,7 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function ContratoCard({
-  c,
-  empresa,
-  color,
-}: {
-  c: Contrato;
-  empresa: string;
-  color: string;
-}) {
+function ContratoCard({ c, empresa, color }: { c: Contrato; empresa: string; color: string }) {
   const st = calcStatus(c).status;
   return (
     <div
@@ -254,8 +242,7 @@ function MonthSection({
     (c) => calcStatus(c).status === "RISCO" || calcStatus(c).status === "VENCIDO",
   ).length;
   const label = capitalize(format(parseISO(mes + "-01"), "MMMM 'de' yyyy", { locale: ptBR }));
-  const empresaNome = (id: string) =>
-    empresas.find((e) => e.id === id)?.nomeFantasia ?? "—";
+  const empresaNome = (id: string) => empresas.find((e) => e.id === id)?.nomeFantasia ?? "—";
 
   return (
     <div>
@@ -297,7 +284,15 @@ function EmpresaCard({
   r,
   color,
 }: {
-  r: { empresa: Empresa; total: number; VIGENTE: number; PROXIMO: number; RISCO: number; VENCIDO: number; situacao: "verde" | "amarelo" | "vermelho" };
+  r: {
+    empresa: Empresa;
+    total: number;
+    VIGENTE: number;
+    PROXIMO: number;
+    RISCO: number;
+    VENCIDO: number;
+    situacao: "verde" | "amarelo" | "vermelho";
+  };
   color: string;
 }) {
   const sitColor =
@@ -331,10 +326,7 @@ function EmpresaCard({
           className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold flex-shrink-0"
           style={{ background: sitColor + "1a", color: sitColor }}
         >
-          <span
-            className="w-1.5 h-1.5 rounded-full"
-            style={{ background: sitColor }}
-          />
+          <span className="w-1.5 h-1.5 rounded-full" style={{ background: sitColor }} />
           {sitLabel}
         </span>
       </div>
@@ -354,7 +346,10 @@ function EmpresaCard({
             <span className="text-[18px] font-bold" style={{ color: c }}>
               {value}
             </span>
-            <span className="text-[10px] font-medium text-center leading-tight mt-0.5" style={{ color: c }}>
+            <span
+              className="text-[10px] font-medium text-center leading-tight mt-0.5"
+              style={{ color: c }}
+            >
               {label}
             </span>
           </div>
@@ -424,8 +419,7 @@ function Relatorios() {
   const [inicio, setInicio] = useState("");
   const [fim, setFim] = useState("");
 
-  const empresaNome = (id: string) =>
-    empresas.find((e) => e.id === id)?.nomeFantasia ?? "—";
+  const empresaNome = (id: string) => empresas.find((e) => e.id === id)?.nomeFantasia ?? "—";
 
   // ===== Rel 1: próximos 4 meses =====
   const rel1 = useMemo(() => {
@@ -455,8 +449,7 @@ function Relatorios() {
             q === "" ||
             c.funcionarioNome.toLowerCase().includes(q) ||
             empresaNome(c.empresaId).toLowerCase().includes(q);
-          const matchSt =
-            statusFiltro === "TODOS" || calcStatus(c).status === statusFiltro;
+          const matchSt = statusFiltro === "TODOS" || calcStatus(c).status === statusFiltro;
           return matchQ && matchSt;
         });
         return [mes, fl] as [string, typeof fl];
@@ -466,8 +459,7 @@ function Relatorios() {
 
   const rel1Total = rel1.reduce((a, [, l]) => a + l.length, 0);
   const rel1Risco = rel1.reduce(
-    (a, [, l]) =>
-      a + l.filter((c) => ["RISCO", "VENCIDO"].includes(calcStatus(c).status)).length,
+    (a, [, l]) => a + l.filter((c) => ["RISCO", "VENCIDO"].includes(calcStatus(c).status)).length,
     0,
   );
 
@@ -497,8 +489,7 @@ function Relatorios() {
         const sit: "verde" | "amarelo" | "vermelho" =
           propRisco >= 0.3
             ? "vermelho"
-            : propRisco > 0 ||
-                totals.PROXIMO / Math.max(totals.total, 1) >= 0.3
+            : propRisco > 0 || totals.PROXIMO / Math.max(totals.total, 1) >= 0.3
               ? "amarelo"
               : "verde";
         return { empresa: e, ...totals, situacao: sit };
@@ -516,11 +507,7 @@ function Relatorios() {
       "Em risco": r.RISCO,
       Vencidos: r.VENCIDO,
       Situação:
-        r.situacao === "verde"
-          ? "Saudável"
-          : r.situacao === "amarelo"
-            ? "Atenção"
-            : "Crítico",
+        r.situacao === "verde" ? "Saudável" : r.situacao === "amarelo" ? "Atenção" : "Crítico",
     }));
     downloadCsv(`resumo_empresas_${csvDateStamp()}.csv`, toCsv(rows));
   };
@@ -593,7 +580,10 @@ function Relatorios() {
               <h2 className="text-[15px] font-semibold" style={{ color: "#0f172a" }}>
                 Contratos a vencer nos próximos 4 meses
               </h2>
-              <p className="text-[13px] mt-0.5 flex items-center gap-2" style={{ color: "#64748b" }}>
+              <p
+                className="text-[13px] mt-0.5 flex items-center gap-2"
+                style={{ color: "#64748b" }}
+              >
                 {rel1Total} contrato{rel1Total !== 1 ? "s" : ""}
                 {rel1Risco > 0 && (
                   <>
@@ -686,7 +676,11 @@ function Relatorios() {
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             {rel2.map((r, i) => (
-              <EmpresaCard key={r.empresa.id} r={r} color={AVATAR_PALETTE[i % AVATAR_PALETTE.length]} />
+              <EmpresaCard
+                key={r.empresa.id}
+                r={r}
+                color={AVATAR_PALETTE[i % AVATAR_PALETTE.length]}
+              />
             ))}
           </div>
         </div>
@@ -748,7 +742,10 @@ function Relatorios() {
             </label>
             {(inicio || fim) && (
               <button
-                onClick={() => { setInicio(""); setFim(""); }}
+                onClick={() => {
+                  setInicio("");
+                  setFim("");
+                }}
                 className="text-[12px] px-3 py-1.5 rounded-lg transition-colors"
                 style={{ color: "#ef4444", background: "#fee2e2" }}
               >

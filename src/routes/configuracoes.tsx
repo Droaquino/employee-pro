@@ -78,22 +78,50 @@ function ConfiguracoesPage() {
   return (
     <div>
       <Breadcrumb items={[{ label: "Operacional" }, { label: "Configurações" }]} />
-      <PageHeader title="Configurações" subtitle="Parâmetros de operação e responsáveis pelo acompanhamento." />
+      <PageHeader
+        title="Configurações"
+        subtitle="Parâmetros de operação e responsáveis pelo acompanhamento."
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Surface title="Parâmetros de alerta">
           <div className="space-y-4 text-[13px]">
             <Row label="Dias para considerar 'em risco'" hint="Contratos com vencimento ≤ N dias">
-              <input type="number" min={1} max={60} value={risco} onChange={(e) => setRisco(+e.target.value)}
-                className="w-20 px-2 py-1.5 rounded-md text-[13px] outline-none" style={{ border: "1px solid #e2e5f0" }} />
+              <input
+                type="number"
+                min={1}
+                max={60}
+                value={risco}
+                onChange={(e) => setRisco(+e.target.value)}
+                className="w-20 px-2 py-1.5 rounded-md text-[13px] outline-none"
+                style={{ border: "1px solid #e2e5f0" }}
+              />
             </Row>
-            <Row label="Dias para 'próximo do vencimento'" hint="Contratos com vencimento ≤ N dias e > risco">
-              <input type="number" min={1} max={120} value={proximo} onChange={(e) => setProximo(+e.target.value)}
-                className="w-20 px-2 py-1.5 rounded-md text-[13px] outline-none" style={{ border: "1px solid #e2e5f0" }} />
+            <Row
+              label="Dias para 'próximo do vencimento'"
+              hint="Contratos com vencimento ≤ N dias e > risco"
+            >
+              <input
+                type="number"
+                min={1}
+                max={120}
+                value={proximo}
+                onChange={(e) => setProximo(+e.target.value)}
+                className="w-20 px-2 py-1.5 rounded-md text-[13px] outline-none"
+                style={{ border: "1px solid #e2e5f0" }}
+              />
             </Row>
-            <Row label="Notificações ao abrir o sistema" hint="Exibir resumo de contratos em risco/vencidos">
+            <Row
+              label="Notificações ao abrir o sistema"
+              hint="Exibir resumo de contratos em risco/vencidos"
+            >
               <label className="inline-flex items-center cursor-pointer">
-                <input type="checkbox" checked={notif} onChange={(e) => setNotif(e.target.checked)} className="w-4 h-4" />
+                <input
+                  type="checkbox"
+                  checked={notif}
+                  onChange={(e) => setNotif(e.target.checked)}
+                  className="w-4 h-4"
+                />
               </label>
             </Row>
             <p className="text-[11px]" style={{ color: "#94a3b8" }}>
@@ -107,7 +135,11 @@ function ConfiguracoesPage() {
             {!adicionando && (
               <button
                 type="button"
-                onClick={() => { setAdicionando(true); setEditandoId(null); setErro(null); }}
+                onClick={() => {
+                  setAdicionando(true);
+                  setEditandoId(null);
+                  setErro(null);
+                }}
                 className="inline-flex items-center gap-1.5 text-[12px] font-medium rounded-md px-2.5 py-1.5"
                 style={{ background: COLORS.brand, color: "#fff" }}
                 aria-label="Adicionar responsável"
@@ -127,10 +159,7 @@ function ConfiguracoesPage() {
           )}
 
           {adicionando && (
-            <FormResponsavel
-              onCancel={() => setAdicionando(false)}
-              onSave={adicionar}
-            />
+            <FormResponsavel onCancel={() => setAdicionando(false)} onSave={adicionar} />
           )}
 
           <ul className="divide-y text-[13px]" style={{ borderColor: "#e2e5f0" }}>
@@ -157,10 +186,16 @@ function ConfiguracoesPage() {
                     className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-semibold text-white shrink-0"
                     style={{ background: "#071040" }}
                   >
-                    {r.nome.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+                    {r.nome
+                      .split(" ")
+                      .map((n) => n[0])
+                      .slice(0, 2)
+                      .join("")}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <div className="truncate" style={{ color: COLORS.textPrimary }}>{r.nome}</div>
+                    <div className="truncate" style={{ color: COLORS.textPrimary }}>
+                      {r.nome}
+                    </div>
                     <div className="text-[11px] truncate" style={{ color: COLORS.textMuted }}>
                       {r.cargo} · {r.email}
                       {vinculos > 0 ? ` · ${vinculos} empresa(s)` : ""}
@@ -169,7 +204,9 @@ function ConfiguracoesPage() {
 
                   {removendo ? (
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[11px]" style={{ color: COLORS.textMuted }}>Remover?</span>
+                      <span className="text-[11px]" style={{ color: COLORS.textMuted }}>
+                        Remover?
+                      </span>
                       <button
                         type="button"
                         onClick={() => confirmarRemocao(r.id)}
@@ -193,7 +230,11 @@ function ConfiguracoesPage() {
                     <div className="flex items-center gap-1">
                       <button
                         type="button"
-                        onClick={() => { setEditandoId(r.id); setAdicionando(false); setErro(null); }}
+                        onClick={() => {
+                          setEditandoId(r.id);
+                          setAdicionando(false);
+                          setErro(null);
+                        }}
                         aria-label={`Editar ${r.nome}`}
                         title="Editar"
                         className="p-1.5 rounded hover:bg-slate-100"
@@ -203,7 +244,10 @@ function ConfiguracoesPage() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => { setRemovendoId(r.id); setErro(null); }}
+                        onClick={() => {
+                          setRemovendoId(r.id);
+                          setErro(null);
+                        }}
                         aria-label={`Remover ${r.nome}`}
                         title="Remover"
                         className="p-1.5 rounded hover:bg-slate-100"
@@ -284,7 +328,11 @@ function FormResponsavel({
           style={{ border: "1px solid #e2e5f0" }}
         />
       </div>
-      {erro && <div className="text-[11px]" style={{ color: COLORS.risco }}>{erro}</div>}
+      {erro && (
+        <div className="text-[11px]" style={{ color: COLORS.risco }}>
+          {erro}
+        </div>
+      )}
       <div className="flex items-center justify-end gap-2">
         <button
           type="button"
@@ -307,12 +355,24 @@ function FormResponsavel({
   );
 }
 
-function Row({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+function Row({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex items-start justify-between gap-4">
       <div>
         <div style={{ color: "#0f172a", fontWeight: 500 }}>{label}</div>
-        {hint && <div className="text-[11px]" style={{ color: "#64748b" }}>{hint}</div>}
+        {hint && (
+          <div className="text-[11px]" style={{ color: "#64748b" }}>
+            {hint}
+          </div>
+        )}
       </div>
       <div>{children}</div>
     </div>

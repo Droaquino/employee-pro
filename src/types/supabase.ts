@@ -71,11 +71,34 @@ export interface HistoricoRow {
 export interface Database {
   public: {
     Tables: {
-      profiles: { Row: ProfileRow; Insert: Omit<ProfileRow, "criado_em"> & Partial<Pick<ProfileRow, "criado_em">>; Update: Partial<ProfileRow> };
-      empresas: { Row: EmpresaRow; Insert: Omit<EmpresaRow, "id" | "criado_em"> & Partial<Pick<EmpresaRow, "id" | "criado_em">>; Update: Partial<EmpresaRow> };
-      colaboradores: { Row: ColaboradorRow; Insert: Omit<ColaboradorRow, "id" | "criado_em"> & Partial<Pick<ColaboradorRow, "id" | "criado_em">>; Update: Partial<ColaboradorRow> };
-      contratos: { Row: ContratoRow; Insert: Omit<ContratoRow, "id" | "criado_em"> & Partial<Pick<ContratoRow, "id" | "criado_em">>; Update: Partial<ContratoRow> };
-      historico: { Row: HistoricoRow; Insert: Omit<HistoricoRow, "id" | "at"> & Partial<Pick<HistoricoRow, "id" | "at">>; Update: Partial<HistoricoRow> };
+      profiles: {
+        Row: ProfileRow;
+        Insert: Omit<ProfileRow, "criado_em"> & Partial<Pick<ProfileRow, "criado_em">>;
+        Update: Partial<ProfileRow>;
+      };
+      empresas: {
+        Row: EmpresaRow;
+        Insert: Omit<EmpresaRow, "id" | "criado_em"> &
+          Partial<Pick<EmpresaRow, "id" | "criado_em">>;
+        Update: Partial<EmpresaRow>;
+      };
+      colaboradores: {
+        Row: ColaboradorRow;
+        Insert: Omit<ColaboradorRow, "id" | "criado_em"> &
+          Partial<Pick<ColaboradorRow, "id" | "criado_em">>;
+        Update: Partial<ColaboradorRow>;
+      };
+      contratos: {
+        Row: ContratoRow;
+        Insert: Omit<ContratoRow, "id" | "criado_em"> &
+          Partial<Pick<ContratoRow, "id" | "criado_em">>;
+        Update: Partial<ContratoRow>;
+      };
+      historico: {
+        Row: HistoricoRow;
+        Insert: Omit<HistoricoRow, "id" | "at"> & Partial<Pick<HistoricoRow, "id" | "at">>;
+        Update: Partial<HistoricoRow>;
+      };
     };
     Functions: {
       get_my_role: { Args: Record<never, never>; Returns: UserRole };

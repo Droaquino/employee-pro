@@ -15,7 +15,10 @@ export const Route = createFileRoute("/proximos-vencimentos")({
   head: () => ({
     meta: [
       { title: "Próximos vencimentos — Arbrent" },
-      { name: "description", content: "Contratos com vencimento nos próximos 30 dias agrupados por semana." },
+      {
+        name: "description",
+        content: "Contratos com vencimento nos próximos 30 dias agrupados por semana.",
+      },
     ],
   }),
   component: Proximos,
@@ -42,7 +45,10 @@ function Proximos() {
     const hoje = startOfDay(new Date());
     return contratos
       .filter((c) => !c.encerrado)
-      .map((c) => ({ c, dias: differenceInCalendarDays(startOfDay(parseISO(c.vencimentoSegundo)), hoje) }))
+      .map((c) => ({
+        c,
+        dias: differenceInCalendarDays(startOfDay(parseISO(c.vencimentoSegundo)), hoje),
+      }))
       .filter(({ dias }) => dias >= 0 && dias <= 30)
       .sort((a, b) => a.dias - b.dias);
   }, [contratos]);
@@ -57,27 +63,44 @@ function Proximos() {
   const empresaNome = (id: string) => empresas.find((e) => e.id === id)?.nomeFantasia ?? "—";
 
   useEffect(() => {
-    document.title = lista.length > 0 ? `${lista.length} próximos · Arbrent` : "Próximos vencimentos · Arbrent";
+    document.title =
+      lista.length > 0 ? `${lista.length} próximos · Arbrent` : "Próximos vencimentos · Arbrent";
   }, [lista.length]);
 
   return (
     <div>
       <Breadcrumb items={[{ label: "Alertas" }, { label: "Próximos vencimentos" }]} />
-      <PageHeader title="Próximos vencimentos" subtitle={`${lista.length} contrato(s) com vencimento nos próximos 30 dias.`} />
+      <PageHeader
+        title="Próximos vencimentos"
+        subtitle={`${lista.length} contrato(s) com vencimento nos próximos 30 dias.`}
+      />
 
       <Surface title="Distribuição dos vencimentos (próximos 30 dias)" className="mb-4">
         <Vencimentos30DiasChart contratos={contratos} />
       </Surface>
 
       {grupos.length === 0 ? (
-        <Surface><EmptyState icon="inbox" title="Nenhum vencimento próximo" subtitle="Não há contratos vencendo nos próximos 30 dias." /></Surface>
+        <Surface>
+          <EmptyState
+            icon="inbox"
+            title="Nenhum vencimento próximo"
+            subtitle="Não há contratos vencendo nos próximos 30 dias."
+          />
+        </Surface>
       ) : (
         grupos.map(([label, items]) => (
           <Surface key={label} title={`${label} · ${items.length}`} className="mb-4">
             <table className="text-[12px] w-full" aria-label={`Vencimentos ${label}`}>
-              <thead><tr style={{ color: "#64748b", textAlign: "left" }}>
-                <Th>Funcionário</Th><Th>CPF</Th><Th>Empresa</Th><Th>Vencimento</Th><Th>Restantes</Th><Th>Avaliação</Th>
-              </tr></thead>
+              <thead>
+                <tr style={{ color: "#64748b", textAlign: "left" }}>
+                  <Th>Funcionário</Th>
+                  <Th>CPF</Th>
+                  <Th>Empresa</Th>
+                  <Th>Vencimento</Th>
+                  <Th>Restantes</Th>
+                  <Th>Avaliação</Th>
+                </tr>
+              </thead>
               <tbody>
                 {items.map(({ c, dias }) => {
                   const f = formatDiasRestantes(dias);
@@ -93,7 +116,10 @@ function Proximos() {
                       avaliacao={av}
                       isOpen={isOpen}
                       onToggle={() => setOpenId(isOpen ? null : c.id)}
-                      onSave={(novoAv) => { setAvaliacoes((prev) => ({ ...prev, [c.id]: novoAv })); setOpenId(null); }}
+                      onSave={(novoAv) => {
+                        setAvaliacoes((prev) => ({ ...prev, [c.id]: novoAv }));
+                        setOpenId(null);
+                      }}
                     />
                   );
                 })}
@@ -106,11 +132,26 @@ function Proximos() {
   );
 }
 
-function Th({ children }: { children: React.ReactNode }) { return <th className="py-2 px-3 font-medium uppercase text-[10px] tracking-wider">{children}</th>; }
-function Td({ children, colSpan }: { children: React.ReactNode; colSpan?: number }) { return <td colSpan={colSpan} className="py-2.5 px-3 align-middle">{children}</td>; }
+function Th({ children }: { children: React.ReactNode }) {
+  return <th className="py-2 px-3 font-medium uppercase text-[10px] tracking-wider">{children}</th>;
+}
+function Td({ children, colSpan }: { children: React.ReactNode; colSpan?: number }) {
+  return (
+    <td colSpan={colSpan} className="py-2.5 px-3 align-middle">
+      {children}
+    </td>
+  );
+}
 
 function RowAvaliacao({
-  c, dias, formatStr, empresaNome, avaliacao, isOpen, onToggle, onSave,
+  c,
+  dias,
+  formatStr,
+  empresaNome,
+  avaliacao,
+  isOpen,
+  onToggle,
+  onSave,
 }: {
   c: Contrato;
   dias: number;
@@ -132,15 +173,32 @@ function RowAvaliacao({
         <Td>{maskCpf(c.funcionarioCpf)}</Td>
         <Td>{empresaNome}</Td>
         <Td>{format(parseISO(c.vencimentoSegundo), "dd/MM/yyyy")}</Td>
-        <Td><span style={{ color: formatStr.cor, fontWeight: formatStr.bold ? 600 : 400 }}>{formatStr.texto}</span></Td>
+        <Td>
+          <span style={{ color: formatStr.cor, fontWeight: formatStr.bold ? 600 : 400 }}>
+            {formatStr.texto}
+          </span>
+        </Td>
         <Td>
           {avaliacao ? (
             <span className="inline-flex items-center gap-2">
-              <span className="text-[11px] px-2 py-0.5 rounded" style={{ background: "#f0f5ff", color: "#071040" }}>{decisaoLabel(avaliacao.decisao)}</span>
-              <button onClick={onToggle} className="text-[11px]" style={{ color: "#4f8ef7" }}>Editar</button>
+              <span
+                className="text-[11px] px-2 py-0.5 rounded"
+                style={{ background: "#f0f5ff", color: "#071040" }}
+              >
+                {decisaoLabel(avaliacao.decisao)}
+              </span>
+              <button onClick={onToggle} className="text-[11px]" style={{ color: "#4f8ef7" }}>
+                Editar
+              </button>
             </span>
           ) : (
-            <button onClick={onToggle} className="text-[11px] px-2 py-1 rounded text-white" style={{ background: "#071040" }}>Registrar avaliação</button>
+            <button
+              onClick={onToggle}
+              className="text-[11px] px-2 py-1 rounded text-white"
+              style={{ background: "#071040" }}
+            >
+              Registrar avaliação
+            </button>
           )}
         </Td>
       </tr>
@@ -158,27 +216,39 @@ function RowAvaliacao({
               />
               <div className="flex items-center gap-2 flex-wrap">
                 {(["EFETIVAR", "NAO_RENOVAR", "AGUARDAR"] as Decisao[]).map((d) => (
-                  <button key={d} onClick={() => setDecisao(d)}
+                  <button
+                    key={d}
+                    onClick={() => setDecisao(d)}
                     className="text-[11px] px-2.5 py-1 rounded-full"
                     style={{
                       background: decisao === d ? "#071040" : "transparent",
                       color: decisao === d ? "#fff" : "#071040",
                       border: "1px solid #071040",
-                    }}>
+                    }}
+                  >
                     {decisaoLabel(d)}
                   </button>
                 ))}
                 <div className="flex-1" />
-                <button onClick={onToggle} className="text-[11px]" style={{ color: "#64748b" }}>Cancelar</button>
+                <button onClick={onToggle} className="text-[11px]" style={{ color: "#64748b" }}>
+                  Cancelar
+                </button>
                 <button
                   disabled={!obs.trim()}
-                  onClick={() => onSave({ obs: obs.trim(), decisao, data: format(new Date(), "yyyy-MM-dd") })}
+                  onClick={() =>
+                    onSave({ obs: obs.trim(), decisao, data: format(new Date(), "yyyy-MM-dd") })
+                  }
                   className="text-[11px] px-3 py-1 rounded text-white"
-                  style={{ background: obs.trim() ? "#071040" : "#94a3b8" }}>
+                  style={{ background: obs.trim() ? "#071040" : "#94a3b8" }}
+                >
                   Salvar
                 </button>
               </div>
-              {avaliacao && <div className="text-[11px]" style={{ color: "#64748b" }}>Última avaliação: {avaliacao.data}</div>}
+              {avaliacao && (
+                <div className="text-[11px]" style={{ color: "#64748b" }}>
+                  Última avaliação: {avaliacao.data}
+                </div>
+              )}
             </div>
           </Td>
         </tr>

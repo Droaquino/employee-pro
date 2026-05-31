@@ -125,7 +125,9 @@ export function CalculadoraPrazo() {
                   min={1}
                   max={90}
                   value={prazo1}
-                  onChange={(e) => setPrazo1(Math.max(1, Math.min(90, Number(e.target.value) || 0)))}
+                  onChange={(e) =>
+                    setPrazo1(Math.max(1, Math.min(90, Number(e.target.value) || 0)))
+                  }
                   className="w-full rounded-md px-3 py-2 text-[13px]"
                   style={{ border: `1px solid ${COLORS.borderSoft}`, color: COLORS.textPrimary }}
                 />
@@ -144,7 +146,9 @@ export function CalculadoraPrazo() {
                   min={1}
                   max={90}
                   value={prazo2}
-                  onChange={(e) => setPrazo2(Math.max(1, Math.min(90, Number(e.target.value) || 0)))}
+                  onChange={(e) =>
+                    setPrazo2(Math.max(1, Math.min(90, Number(e.target.value) || 0)))
+                  }
                   className="w-full rounded-md px-3 py-2 text-[13px]"
                   style={{ border: `1px solid ${COLORS.borderSoft}`, color: COLORS.textPrimary }}
                 />
@@ -164,25 +168,43 @@ export function CalculadoraPrazo() {
                   label="1º vencimento"
                   valor={fmt(result.venc1)}
                   hint={labelDias(result.diasAteVenc1)}
-                  tone={result.diasAteVenc1 < 0 ? "critico" : result.diasAteVenc1 <= 15 ? "atencao" : "ok"}
+                  tone={
+                    result.diasAteVenc1 < 0
+                      ? "critico"
+                      : result.diasAteVenc1 <= 15
+                        ? "atencao"
+                        : "ok"
+                  }
                 />
                 <Linha
                   label="2º vencimento (efetivação)"
                   valor={fmt(result.venc2)}
                   hint={labelDias(result.diasAteVenc2)}
-                  tone={result.diasAteVenc2 < 0 ? "critico" : result.diasAteVenc2 <= 15 ? "atencao" : "ok"}
+                  tone={
+                    result.diasAteVenc2 < 0
+                      ? "critico"
+                      : result.diasAteVenc2 <= 15
+                        ? "atencao"
+                        : "ok"
+                  }
                 />
                 <div
                   className="pt-2 mt-2 text-[11px] leading-snug"
                   style={{ borderTop: `1px dashed ${COLORS.borderSoft}`, color: COLORS.textMuted }}
                 >
                   <div>
-                    Alerta avaliação <strong style={{ color: COLORS.textPrimary }}>{fmtCurto(result.alertaAvaliacao)}</strong>
-                    {" "}— 15 dias antes do 1º vencimento.
+                    Alerta avaliação{" "}
+                    <strong style={{ color: COLORS.textPrimary }}>
+                      {fmtCurto(result.alertaAvaliacao)}
+                    </strong>{" "}
+                    — 15 dias antes do 1º vencimento.
                   </div>
                   <div className="mt-1">
-                    Alerta decisão <strong style={{ color: COLORS.textPrimary }}>{fmtCurto(result.alertaDecisao)}</strong>
-                    {" "}— 15 dias antes da efetivação.
+                    Alerta decisão{" "}
+                    <strong style={{ color: COLORS.textPrimary }}>
+                      {fmtCurto(result.alertaDecisao)}
+                    </strong>{" "}
+                    — 15 dias antes da efetivação.
                   </div>
                 </div>
               </div>
@@ -211,12 +233,17 @@ function Linha({
   hint: string;
   tone: "ok" | "atencao" | "critico";
 }) {
-  const color = tone === "critico" ? COLORS.risco : tone === "atencao" ? COLORS.proximo : COLORS.vigente;
+  const color =
+    tone === "critico" ? COLORS.risco : tone === "atencao" ? COLORS.proximo : COLORS.vigente;
   return (
     <div className="flex items-start justify-between gap-2">
       <div className="min-w-0">
-        <div className="text-[11px]" style={{ color: COLORS.textMuted }}>{label}</div>
-        <div className="text-[12.5px] font-medium" style={{ color: COLORS.textPrimary }}>{valor}</div>
+        <div className="text-[11px]" style={{ color: COLORS.textMuted }}>
+          {label}
+        </div>
+        <div className="text-[12.5px] font-medium" style={{ color: COLORS.textPrimary }}>
+          {valor}
+        </div>
       </div>
       <span
         className="shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-semibold text-white"

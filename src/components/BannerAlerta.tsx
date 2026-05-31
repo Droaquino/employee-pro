@@ -13,12 +13,17 @@ export function BannerAlerta() {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    try { setDismissed(sessionStorage.getItem(SESSION_KEY) === "1"); } catch { /* ignore */ }
+    try {
+      setDismissed(sessionStorage.getItem(SESSION_KEY) === "1");
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   const { vencidos, semana } = useMemo(() => {
     const hoje = startOfDay(new Date());
-    let vencidos = 0, semana = 0;
+    let vencidos = 0,
+      semana = 0;
     for (const c of contratos) {
       if (c.encerrado) continue;
       const dias = differenceInCalendarDays(startOfDay(parseISO(c.vencimentoSegundo)), hoje);
@@ -32,7 +37,11 @@ export function BannerAlerta() {
   if (!variant || dismissed) return null;
 
   const dispensar = () => {
-    try { sessionStorage.setItem(SESSION_KEY, "1"); } catch { /* ignore */ }
+    try {
+      sessionStorage.setItem(SESSION_KEY, "1");
+    } catch {
+      /* ignore */
+    }
     setDismissed(true);
   };
 
@@ -48,7 +57,9 @@ export function BannerAlerta() {
         }}
         role="alert"
       >
-        <span aria-hidden style={{ fontSize: 18, lineHeight: 1 }}>⚠️</span>
+        <span aria-hidden style={{ fontSize: 18, lineHeight: 1 }}>
+          ⚠️
+        </span>
         <div className="flex-1 text-[13px]" style={{ color: "#7f1d1d" }}>
           <strong>{vencidos} contrato(s) vencidos não regularizados</strong>
           <div style={{ color: "#991b1b" }}>
@@ -62,7 +73,14 @@ export function BannerAlerta() {
         >
           Ver contratos →
         </Link>
-        <button onClick={dispensar} aria-label="Dispensar alerta" className="text-[18px] leading-none px-1" style={{ color: "#7f1d1d" }}>×</button>
+        <button
+          onClick={dispensar}
+          aria-label="Dispensar alerta"
+          className="text-[18px] leading-none px-1"
+          style={{ color: "#7f1d1d" }}
+        >
+          ×
+        </button>
       </div>
     );
   }
@@ -78,12 +96,12 @@ export function BannerAlerta() {
       }}
       role="alert"
     >
-      <span aria-hidden style={{ fontSize: 18, lineHeight: 1 }}>⚠️</span>
+      <span aria-hidden style={{ fontSize: 18, lineHeight: 1 }}>
+        ⚠️
+      </span>
       <div className="flex-1 text-[13px]" style={{ color: "#78350f" }}>
         <strong>{semana} contrato(s) vencem nos próximos 7 dias</strong>
-        <div style={{ color: "#92400e" }}>
-          Priorize avaliações para evitar urgências.
-        </div>
+        <div style={{ color: "#92400e" }}>Priorize avaliações para evitar urgências.</div>
       </div>
       <Link
         to="/em-risco"
@@ -92,7 +110,14 @@ export function BannerAlerta() {
       >
         Ver contratos →
       </Link>
-      <button onClick={dispensar} aria-label="Dispensar alerta" className="text-[18px] leading-none px-1" style={{ color: "#78350f" }}>×</button>
+      <button
+        onClick={dispensar}
+        aria-label="Dispensar alerta"
+        className="text-[18px] leading-none px-1"
+        style={{ color: "#78350f" }}
+      >
+        ×
+      </button>
     </div>
   );
 }
