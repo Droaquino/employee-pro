@@ -17,7 +17,7 @@ import { Route as EmRiscoRouteImport } from './routes/em-risco'
 import { Route as ContratosRouteImport } from './routes/contratos'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as EmpresasIdRouteImport } from './routes/empresas.$id'
+import { Route as EmpresasIdRouteImport } from './routes/empresas_.$id'
 import { Route as ClienteIdPainelRouteImport } from './routes/cliente.$id.painel'
 
 const RelatoriosRoute = RelatoriosRouteImport.update({
@@ -61,9 +61,9 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmpresasIdRoute = EmpresasIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => EmpresasRoute,
+  id: '/empresas_/$id',
+  path: '/empresas/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ClienteIdPainelRoute = ClienteIdPainelRouteImport.update({
   id: '/cliente/$id/painel',
@@ -76,7 +76,7 @@ export interface FileRoutesByFullPath {
   '/configuracoes': typeof ConfiguracoesRoute
   '/contratos': typeof ContratosRoute
   '/em-risco': typeof EmRiscoRoute
-  '/empresas': typeof EmpresasRouteWithChildren
+  '/empresas': typeof EmpresasRoute
   '/historico': typeof HistoricoRoute
   '/proximos-vencimentos': typeof ProximosVencimentosRoute
   '/relatorios': typeof RelatoriosRoute
@@ -88,7 +88,7 @@ export interface FileRoutesByTo {
   '/configuracoes': typeof ConfiguracoesRoute
   '/contratos': typeof ContratosRoute
   '/em-risco': typeof EmRiscoRoute
-  '/empresas': typeof EmpresasRouteWithChildren
+  '/empresas': typeof EmpresasRoute
   '/historico': typeof HistoricoRoute
   '/proximos-vencimentos': typeof ProximosVencimentosRoute
   '/relatorios': typeof RelatoriosRoute
@@ -101,11 +101,11 @@ export interface FileRoutesById {
   '/configuracoes': typeof ConfiguracoesRoute
   '/contratos': typeof ContratosRoute
   '/em-risco': typeof EmRiscoRoute
-  '/empresas': typeof EmpresasRouteWithChildren
+  '/empresas': typeof EmpresasRoute
   '/historico': typeof HistoricoRoute
   '/proximos-vencimentos': typeof ProximosVencimentosRoute
   '/relatorios': typeof RelatoriosRoute
-  '/empresas/$id': typeof EmpresasIdRoute
+  '/empresas_/$id': typeof EmpresasIdRoute
   '/cliente/$id/painel': typeof ClienteIdPainelRoute
 }
 export interface FileRouteTypes {
@@ -143,7 +143,7 @@ export interface FileRouteTypes {
     | '/historico'
     | '/proximos-vencimentos'
     | '/relatorios'
-    | '/empresas/$id'
+    | '/empresas_/$id'
     | '/cliente/$id/painel'
   fileRoutesById: FileRoutesById
 }
@@ -152,10 +152,11 @@ export interface RootRouteChildren {
   ConfiguracoesRoute: typeof ConfiguracoesRoute
   ContratosRoute: typeof ContratosRoute
   EmRiscoRoute: typeof EmRiscoRoute
-  EmpresasRoute: typeof EmpresasRouteWithChildren
+  EmpresasRoute: typeof EmpresasRoute
   HistoricoRoute: typeof HistoricoRoute
   ProximosVencimentosRoute: typeof ProximosVencimentosRoute
   RelatoriosRoute: typeof RelatoriosRoute
+  EmpresasIdRoute: typeof EmpresasIdRoute
   ClienteIdPainelRoute: typeof ClienteIdPainelRoute
 }
 
@@ -217,12 +218,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/empresas/$id': {
-      id: '/empresas/$id'
-      path: '/$id'
+    '/empresas_/$id': {
+      id: '/empresas_/$id'
+      path: '/empresas/$id'
       fullPath: '/empresas/$id'
       preLoaderRoute: typeof EmpresasIdRouteImport
-      parentRoute: typeof EmpresasRoute
+      parentRoute: typeof rootRouteImport
     }
     '/cliente/$id/painel': {
       id: '/cliente/$id/painel'
@@ -234,29 +235,28 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface EmpresasRouteChildren {
-  EmpresasIdRoute: typeof EmpresasIdRoute
-}
-
-const EmpresasRouteChildren: EmpresasRouteChildren = {
-  EmpresasIdRoute: EmpresasIdRoute,
-}
-
-const EmpresasRouteWithChildren = EmpresasRoute._addFileChildren(
-  EmpresasRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConfiguracoesRoute: ConfiguracoesRoute,
   ContratosRoute: ContratosRoute,
   EmRiscoRoute: EmRiscoRoute,
-  EmpresasRoute: EmpresasRouteWithChildren,
+  EmpresasRoute: EmpresasRoute,
   HistoricoRoute: HistoricoRoute,
   ProximosVencimentosRoute: ProximosVencimentosRoute,
   RelatoriosRoute: RelatoriosRoute,
+  EmpresasIdRoute: EmpresasIdRoute,
   ClienteIdPainelRoute: ClienteIdPainelRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

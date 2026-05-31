@@ -21,6 +21,8 @@ export const Route = createFileRoute("/empresas")({
 });
 
 function EmpresasPage() {
+
+
   const empresas = useAppStore((s) => s.empresas);
   const contratos = useAppStore((s) => s.contratos);
   const upsertEmpresa = useAppStore((s) => s.upsertEmpresa);

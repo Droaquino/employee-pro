@@ -14,7 +14,7 @@ import { responsaveis } from "@/data/mock";
 import type { Colaborador } from "@/data/mock";
 import { maskCpf } from "@/hooks/useStatusContrato";
 
-export const Route = createFileRoute("/empresas/$id")({
+export const Route = createFileRoute("/empresas_/$id")({
   head: () => ({
     meta: [
       { title: "Detalhe da empresa — Arbrent" },
@@ -35,8 +35,11 @@ function EmpresaDetail() {
   const navigate = useNavigate();
 
   const empresa = useAppStore((s) => s.empresas.find((e) => e.id === id));
-  const contratos = useAppStore((s) => s.contratos.filter((c) => c.empresaId === id));
-  const colaboradores = useAppStore((s) => s.colaboradores.filter((c) => c.empresaId === id));
+  // Use stable selectors (no inline .filter) to avoid infinite re-render loops
+  const allContratos = useAppStore((s) => s.contratos);
+  const allColaboradores = useAppStore((s) => s.colaboradores);
+  const contratos = useMemo(() => allContratos.filter((c) => c.empresaId === id), [allContratos, id]);
+  const colaboradores = useMemo(() => allColaboradores.filter((c) => c.empresaId === id), [allColaboradores, id]);
   const encerrarContratos = useAppStore((s) => s.encerrarContratos);
   const upsertColaborador = useAppStore((s) => s.upsertColaborador);
   const removeColaborador = useAppStore((s) => s.removeColaborador);
