@@ -72,7 +72,7 @@ function PainelCliente() {
               <div className="flex gap-2">
                 <button
                   onClick={() => window.print()}
-                  className="px-3 py-1.5 rounded text-[12px] font-medium text-white"
+                  className="px-4 py-2 rounded-lg text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
                   style={{ background: "#071040" }}
                 >
                   Imprimir / Exportar PDF
@@ -80,7 +80,7 @@ function PainelCliente() {
                 <Link
                   to="/empresas/$id"
                   params={{ id }}
-                  className="px-3 py-1.5 rounded text-[12px] font-medium"
+                  className="px-4 py-2 rounded-lg text-[13px] font-medium transition-colors hover:bg-slate-100"
                   style={{ border: "1px solid #e2e5f0", color: "#64748b" }}
                 >
                   ← Voltar ao sistema
@@ -130,7 +130,7 @@ function PainelCliente() {
               <div className="flex flex-wrap gap-4 justify-center mt-1">
                 {pieData.map((d) => (
                   <div key={d.key} className="flex items-center gap-1.5 text-[12px]" style={{ color: "#0f172a" }}>
-                    <span className="w-2.5 h-2.5 rounded-full" style={{ background: STATUS_COLOR[d.key] }} />
+                    <span style={{ width: 11, height: 11, borderRadius: 3, background: STATUS_COLOR[d.key], flexShrink: 0, display: "inline-block" }} />
                     {d.name} · <span style={{ color: "#64748b" }}>{d.value}</span>
                   </div>
                 ))}

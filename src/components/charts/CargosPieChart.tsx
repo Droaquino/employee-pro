@@ -1,4 +1,4 @@
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { COLORS } from "@/constants/colors";
 import type { Contrato } from "@/data/mock";
 
@@ -14,14 +14,28 @@ export function CargosPieChart({ contratos }: { contratos: Contrato[] }) {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={260}>
-      <PieChart>
-        <Pie data={data} dataKey="value" innerRadius={48} outerRadius={88} paddingAngle={2}>
-          {data.map((d) => <Cell key={d.name} fill={d.fill} />)}
-        </Pie>
-        <Tooltip contentStyle={{ background: "#fff", border: `1px solid ${COLORS.borderSoft}`, borderRadius: 6, fontSize: 12 }} />
-        <Legend wrapperStyle={{ fontSize: 11 }} />
-      </PieChart>
-    </ResponsiveContainer>
+    <div>
+      <ResponsiveContainer width="100%" height={200}>
+        <PieChart>
+          <Pie data={data} dataKey="value" innerRadius={48} outerRadius={80} paddingAngle={2}>
+            {data.map((d) => <Cell key={d.name} fill={d.fill} />)}
+          </Pie>
+          <Tooltip
+            formatter={(value: number, name: string) => [`${value} contrato${value !== 1 ? "s" : ""}`, name]}
+            contentStyle={{ background: "#fff", border: `1px solid ${COLORS.borderSoft}`, borderRadius: 6, fontSize: 12 }}
+          />
+        </PieChart>
+      </ResponsiveContainer>
+      {/* Legenda com quadradinhos */}
+      <div className="flex flex-wrap gap-x-4 gap-y-2 justify-center mt-2 px-2">
+        {data.map((d) => (
+          <div key={d.name} className="flex items-center gap-1.5 text-[11px]" style={{ color: COLORS.textPrimary }}>
+            <span style={{ width: 10, height: 10, borderRadius: 3, background: d.fill, flexShrink: 0, display: "inline-block" }} />
+            <span>{d.name}</span>
+            <span style={{ color: COLORS.textMuted }}>· {d.value}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

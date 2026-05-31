@@ -40,6 +40,8 @@ const EMPTY: Colaborador = {
   telefone: "",
   ativo: true,
   criadoEm: "",
+  prazoRenovacao: undefined,
+  observacao: "",
 };
 
 export function ColaboradorForm({ open, initial, empresaId, onClose, onSave }: Props) {
@@ -158,6 +160,35 @@ export function ColaboradorForm({ open, initial, empresaId, onClose, onSave }: P
               placeholder="(00) 00000-0000"
               value={form.telefone}
               onChange={(e) => setForm({ ...form, telefone: maskTelefone(e.target.value) })}
+            />
+          </Field>
+
+          {/* Prazo de renovação */}
+          <Field label="Prazo de renovação">
+            <select
+              className={inputCls}
+              style={inputStyle(false)}
+              value={form.prazoRenovacao ?? ""}
+              onChange={(e) => setForm({ ...form, prazoRenovacao: e.target.value ? Number(e.target.value) as 30 | 45 | 60 | 90 : undefined })}
+            >
+              <option value="">Não definido</option>
+              <option value="30">30 dias</option>
+              <option value="45">45 dias</option>
+              <option value="60">60 dias</option>
+              <option value="90">90 dias</option>
+            </select>
+          </Field>
+
+          {/* Observação */}
+          <Field label="Observações">
+            <textarea
+              className={inputCls}
+              style={{ ...inputStyle(false), resize: "none" }}
+              rows={3}
+              maxLength={500}
+              placeholder="Anotações internas sobre este colaborador..."
+              value={form.observacao ?? ""}
+              onChange={(e) => setForm({ ...form, observacao: e.target.value })}
             />
           </Field>
 

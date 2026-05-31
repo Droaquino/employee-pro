@@ -5,6 +5,7 @@ import { acaoRecomendada, calcStatus, maskCpf } from "@/hooks/useStatusContrato"
 import { STATUS_COLOR, STATUS_LABEL } from "@/constants/colors";
 import { formatDiasRestantes } from "@/lib/format";
 import { EmptyState } from "@/components/EmptyState";
+import { useAppStore } from "@/store/appStore";
 import type { Contrato } from "@/data/mock";
 
 type SortKey = "funcionarioNome" | "cargo" | "dataAdmissao" | "vencimentoSegundo" | "diasRestantes" | "status";
@@ -106,6 +107,7 @@ export function ContratosTable({ contratos, selectable, selected = [], onSelecti
   const [observations, setObservations] = useState<Record<string, string>>({});
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const renovarContratos = useAppStore((s) => s.renovarContratos);
 
   const rows = useMemo(() => {
     const enriched = contratos.map((c) => ({ c, info: calcStatus(c) }));
@@ -272,7 +274,7 @@ export function ContratosTable({ contratos, selectable, selected = [], onSelecti
                           className="w-full px-3 py-2 rounded-md text-[12px] resize-none outline-none"
                           style={{ border: "1px solid #e2e5f0", background: "#fff" }}
                         />
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           {([
                             { label: "Efetivar", bg: "#16a34a" },
                             { label: "Não renovar", bg: "#dc2626" },
@@ -281,12 +283,23 @@ export function ContratosTable({ contratos, selectable, selected = [], onSelecti
                             <button
                               key={label}
                               onClick={(e) => { e.stopPropagation(); handleAction(c.id, label); }}
-                              className="px-3 py-1.5 rounded-md text-[12px] font-medium text-white hover:opacity-90 transition-opacity"
+                              className="px-4 py-2 rounded-md text-[13px] font-medium text-white hover:opacity-90 transition-opacity"
                               style={{ background: bg }}
                             >
                               {label}
                             </button>
                           ))}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              renovarContratos([c.id]);
+                              handleAction(c.id, `contrato renovado — ${c.funcionarioNome}`);
+                            }}
+                            className="px-4 py-2 rounded-md text-[13px] font-medium text-white hover:opacity-90 transition-opacity"
+                            style={{ background: "#4f8ef7" }}
+                          >
+                            ↻ Renovar
+                          </button>
                         </div>
                       </div>
                     </td>

@@ -22,6 +22,8 @@ export type Colaborador = {
   telefone: string;
   ativo: boolean;
   criadoEm: string;
+  prazoRenovacao?: 30 | 45 | 60 | 90;
+  observacao?: string;
 };
 
 export type Contrato = {
@@ -36,6 +38,7 @@ export type Contrato = {
   prorrogacaoAtual: 1 | 2;
   encerrado: boolean;
   motivoEncerramento?: string;
+  renovadoEm?: string;
 };
 
 export const responsaveis = [

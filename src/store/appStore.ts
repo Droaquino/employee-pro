@@ -9,7 +9,7 @@ export type HistoryEvent = {
   at: string;
   tipo:
     | "EMPRESA_CRIADA" | "EMPRESA_EDITADA" | "EMPRESA_REMOVIDA" | "EMPRESA_ATIVADA" | "EMPRESA_DESATIVADA"
-    | "CONTRATO_ENCERRADO"
+    | "CONTRATO_ENCERRADO" | "CONTRATO_RENOVADO"
     | "COLABORADOR_CRIADO" | "COLABORADOR_EDITADO" | "COLABORADOR_REMOVIDO";
   descricao: string;
   contexto?: Record<string, string>;
@@ -24,6 +24,7 @@ type State = {
   removeEmpresa: (id: string) => void;
   toggleAtivo: (id: string) => void;
   encerrarContratos: (ids: string[], motivo: string) => void;
+  renovarContratos: (ids: string[]) => void;
   upsertColaborador: (c: Colaborador) => void;
   removeColaborador: (id: string) => void;
   toggleAtivoColaborador: (id: string) => void;
@@ -84,6 +85,19 @@ export const useAppStore = create<State>((set) => ({
           tipo: "CONTRATO_ENCERRADO",
           descricao: `${ids.length} contrato(s) encerrado(s): ${nomes.slice(0, 3).join(", ")}${nomes.length > 3 ? "…" : ""}`,
           contexto: { motivo },
+        }),
+      };
+    }),
+
+  renovarContratos: (ids) =>
+    set((s) => {
+      const today = new Date().toISOString().slice(0, 10);
+      const nomes = s.contratos.filter((c) => ids.includes(c.id)).map((c) => c.funcionarioNome);
+      return {
+        contratos: s.contratos.map((c) => (ids.includes(c.id) ? { ...c, renovadoEm: today } : c)),
+        historico: log(s.historico, {
+          tipo: "CONTRATO_RENOVADO",
+          descricao: `${ids.length} contrato(s) renovado(s): ${nomes.slice(0, 3).join(", ")}${nomes.length > 3 ? "…" : ""}`,
         }),
       };
     }),
