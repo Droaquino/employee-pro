@@ -77,14 +77,15 @@ function EmpresaDetail() {
     );
   }, [colaboradores, colQuery]);
 
-  // Contratos renovados nos últimos 30 dias
+  const [renovadoPeriodo, setRenovadoPeriodo] = useState<7 | 15 | 30 | 60 | 90>(30);
+
   const renovados = useMemo(() => {
-    const corte = startOfDay(subDays(new Date(), 30));
+    const corte = startOfDay(subDays(new Date(), renovadoPeriodo));
     return contratos.filter((c) => {
       if (!c.renovadoEm) return false;
       return isAfter(startOfDay(parseISO(c.renovadoEm)), corte) || startOfDay(parseISO(c.renovadoEm)).getTime() === corte.getTime();
     });
-  }, [contratos]);
+  }, [contratos, renovadoPeriodo]);
 
   const handleEncerrar = () => {
     if (selected.length === 0) return;
@@ -346,21 +347,39 @@ function EmpresaDetail() {
 
       {/* ── Renovados ── */}
       <Surface className="mb-4">
-        <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
+        <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
           <div>
             <h3 className="text-[14px] font-semibold" style={{ color: "#071040" }}>
-              Renovados nos últimos 30 dias
+              Renovados nos últimos {renovadoPeriodo} dias
             </h3>
             <p className="text-[11px] mt-0.5" style={{ color: "#64748b" }}>
               Contratos marcados como renovados recentemente
             </p>
           </div>
-          <span
-            className="inline-flex items-center px-3 py-1 rounded-full text-[12px] font-semibold"
-            style={{ background: renovados.length > 0 ? "#dbeafe" : "#f1f5f9", color: renovados.length > 0 ? "#1d4ed8" : "#94a3b8" }}
-          >
-            {renovados.length} contrato{renovados.length !== 1 ? "s" : ""}
-          </span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex gap-1">
+              {([7, 15, 30, 60, 90] as const).map((d) => (
+                <button
+                  key={d}
+                  onClick={() => setRenovadoPeriodo(d)}
+                  className="px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all"
+                  style={
+                    renovadoPeriodo === d
+                      ? { background: "#071040", color: "#fff" }
+                      : { background: "#f0f2f8", color: "#64748b" }
+                  }
+                >
+                  {d}d
+                </button>
+              ))}
+            </div>
+            <span
+              className="inline-flex items-center px-3 py-1 rounded-full text-[12px] font-semibold"
+              style={{ background: renovados.length > 0 ? "#dbeafe" : "#f1f5f9", color: renovados.length > 0 ? "#1d4ed8" : "#94a3b8" }}
+            >
+              {renovados.length} contrato{renovados.length !== 1 ? "s" : ""}
+            </span>
+          </div>
         </div>
 
         {renovados.length === 0 ? (
