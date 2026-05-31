@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { PageHeader, Surface } from "@/components/Surface";
 import { Breadcrumb } from "@/components/Breadcrumb";
-import { useAppStore } from "@/store/appStore";
+import { useEmpresas } from "@/hooks/useEmpresas";
+import { useContratos } from "@/hooks/useContratos";
 import { calcStatus } from "@/hooks/useStatusContrato";
 import { RiscoBarChart } from "@/components/charts/RiscoBarChart";
 import { ContratosTable } from "@/components/ContratosTable";
@@ -18,8 +19,9 @@ export const Route = createFileRoute("/em-risco")({
 });
 
 function EmRisco() {
-  const empresas = useAppStore((s) => s.empresas);
-  const contratos = useAppStore((s) => s.contratos).filter((c) => {
+  const { data: empresas = [] } = useEmpresas();
+  const { data: allContratos = [] } = useContratos();
+  const contratos = allContratos.filter((c) => {
     if (c.encerrado) return false;
     const s = calcStatus(c).status;
     return s === "RISCO" || s === "VENCIDO";

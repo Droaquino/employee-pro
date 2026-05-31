@@ -4,7 +4,8 @@ import { differenceInCalendarDays, format, parseISO, startOfDay } from "date-fns
 import { PageHeader, Surface } from "@/components/Surface";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { EmptyState } from "@/components/EmptyState";
-import { useAppStore } from "@/store/appStore";
+import { useEmpresas } from "@/hooks/useEmpresas";
+import { useContratos } from "@/hooks/useContratos";
 import { calcStatus, maskCpf } from "@/hooks/useStatusContrato";
 import { Vencimentos30DiasChart } from "@/components/charts/Vencimentos30DiasChart";
 import { formatDiasRestantes } from "@/lib/format";
@@ -32,8 +33,8 @@ function bucketLabel(dias: number): string {
 const BUCKETS = ["Esta semana", "Próxima semana", "Em 2 semanas", "Em 3–4 semanas"];
 
 function Proximos() {
-  const empresas = useAppStore((s) => s.empresas);
-  const contratos = useAppStore((s) => s.contratos);
+  const { data: empresas = [] } = useEmpresas();
+  const { data: contratos = [] } = useContratos();
   const [avaliacoes, setAvaliacoes] = useState<Record<string, Avaliacao>>({});
   const [openId, setOpenId] = useState<string | null>(null);
 

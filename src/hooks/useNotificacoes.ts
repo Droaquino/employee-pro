@@ -2,6 +2,9 @@ import { useCallback, useMemo } from "react";
 import { differenceInCalendarDays, format, getISOWeek, getISOWeekYear, parseISO, startOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useAppStore } from "@/store/appStore";
+import { useEmpresas } from "@/hooks/useEmpresas";
+import { useContratos } from "@/hooks/useContratos";
+import { useHistorico } from "@/hooks/useHistorico";
 
 export type TipoNotif = "urgente" | "atencao" | "info";
 export type FiltroNotif = "todos" | TipoNotif;
@@ -38,9 +41,9 @@ const HISTORICO_LABEL: Record<string, { titulo: (d: string) => string; rota: str
 };
 
 export function useNotificacoes() {
-  const contratos  = useAppStore((s) => s.contratos);
-  const empresas   = useAppStore((s) => s.empresas);
-  const historico  = useAppStore((s) => s.historico);
+  const { data: contratos = [] }  = useContratos();
+  const { data: empresas = [] }   = useEmpresas();
+  const { data: historico = [] }  = useHistorico();
   const notifLidas = useAppStore((s) => s.notifLidas);
   const _marcarLida       = useAppStore((s) => s.marcarNotifLida);
   const _marcarTodasLidas = useAppStore((s) => s.marcarTodasNotifLidas);

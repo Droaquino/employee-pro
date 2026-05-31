@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { differenceInCalendarDays, parseISO, startOfDay } from "date-fns";
-import { useAppStore } from "@/store/appStore";
+import { useContratos } from "@/hooks/useContratos";
 import { COLORS } from "@/constants/colors";
 
 const SESSION_KEY = "arbrent_banner_dismissed";
@@ -9,7 +9,7 @@ const SESSION_KEY = "arbrent_banner_dismissed";
 type Variant = "vermelho" | "laranja" | null;
 
 export function BannerAlerta() {
-  const contratos = useAppStore((s) => s.contratos);
+  const { data: contratos = [] } = useContratos();
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {

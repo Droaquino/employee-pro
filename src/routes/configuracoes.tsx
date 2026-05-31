@@ -4,7 +4,7 @@ import { Pencil, Trash2, Plus, Check, X } from "lucide-react";
 import { PageHeader, Surface } from "@/components/Surface";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { responsaveis as responsaveisSeed } from "@/data/mock";
-import { useAppStore } from "@/store/appStore";
+import { useEmpresas } from "@/hooks/useEmpresas";
 import { COLORS } from "@/constants/colors";
 
 type Responsavel = { id: string; nome: string; cargo: string; email: string };
@@ -31,7 +31,7 @@ function ConfiguracoesPage() {
   const [proximo, setProximo] = useState(30);
   const [notif, setNotif] = useState(true);
 
-  const empresas = useAppStore((s) => s.empresas);
+  const { data: empresas = [] } = useEmpresas();
   const [lista, setLista] = useState<Responsavel[]>(seed);
   const [adicionando, setAdicionando] = useState(false);
   const [editandoId, setEditandoId] = useState<string | null>(null);

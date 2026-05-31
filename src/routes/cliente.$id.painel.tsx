@@ -2,7 +2,8 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { useAppStore } from "@/store/appStore";
+import { useEmpresas } from "@/hooks/useEmpresas";
+import { useContratos } from "@/hooks/useContratos";
 import { calcStatus } from "@/hooks/useStatusContrato";
 import { STATUS_COLOR } from "@/constants/colors";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
@@ -21,8 +22,9 @@ export const Route = createFileRoute("/cliente/$id/painel")({
 
 function PainelCliente() {
   const { id } = Route.useParams();
-  const empresa = useAppStore((s) => s.empresas.find((e) => e.id === id));
-  const allContratos = useAppStore((s) => s.contratos);
+  const { data: empresas = [] } = useEmpresas();
+  const empresa = empresas.find((e) => e.id === id);
+  const { data: allContratos = [] } = useContratos();
   const todos = useMemo(
     () => allContratos.filter((c) => c.empresaId === id && !c.encerrado),
     [allContratos, id],

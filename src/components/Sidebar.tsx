@@ -4,6 +4,8 @@ import { differenceInCalendarDays, parseISO, startOfDay } from "date-fns";
 import { useAppStore } from "@/store/appStore";
 import { useNotificacoes } from "@/hooks/useNotificacoes";
 import { SinoNotificacoes } from "@/components/SinoNotificacoes";
+import { useAuth } from "@/contexts/AuthContext";
+import { useContratos } from "@/hooks/useContratos";
 import logo from "@/assets/arbrent-logo.png";
 
 type Item = {
@@ -12,6 +14,7 @@ type Item = {
   icon: React.ReactNode;
   badgeKey?: "risco" | "proximo";
   showDotKey?: "urgenteNaoLida";
+  supervisorOnly?: boolean;
 };
 
 type Group = { label: string; items: Item[] };
@@ -37,17 +40,27 @@ const groups: Group[] = [
   { label: "Operacional", items: [
     { to: "/relatorios", label: "Relatórios", icon: <Icon d="M4 19V5M4 19h16M8 15v-4M12 15V8M16 15v-6" /> },
     { to: "/historico", label: "Histórico", icon: <Icon d="M3 12a9 9 0 109-9M3 12l3-3M3 12l3 3M12 7v5l3 2" /> },
+    { to: "/usuarios", label: "Usuários", icon: <Icon d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />, supervisorOnly: true },
     { to: "/configuracoes", label: "Configurações", icon: <Icon d="M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3h0a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8v0a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z" /> },
   ]},
 ];
 
+function initials(nome: string) {
+  const parts = nome.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
 export function Sidebar() {
   const location = useLocation();
-  const contratos = useAppStore((s) => s.contratos);
+  const { profile, signOut } = useAuth();
+  const { data: contratos = [] } = useContratos();
   const abrirNotifPainel = useAppStore((s) => s.abrirNotifPainel);
   const { naoLidas, naoLidasPorTipo } = useNotificacoes();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+
+  const isSupervisor = profile?.role === "supervisor";
 
   const counts = useMemo(() => {
     if (!mounted) return { risco: 0, proximo: 0 };
@@ -63,26 +76,30 @@ export function Sidebar() {
   }, [contratos, mounted]);
 
   return (
-    <>
-      <aside style={{ background: "#071040", color: "#e8ecff" }} className="fixed inset-y-0 left-0 w-[240px] flex flex-col h-screen overflow-y-auto">
-        <div className="px-5 pt-6 pb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-md flex items-center justify-center bg-white p-1.5">
-              <img src={logo} alt="Logo Arbrent" className="w-full h-full object-contain" />
-            </div>
-            <div>
-              <div className="text-[15px] font-semibold tracking-tight">Arbrent</div>
-              <div className="text-[11px]" style={{ color: "#a8b3e8" }}>Contabilidade · Experiência</div>
-            </div>
+    <aside style={{ background: "#071040", color: "#e8ecff" }} className="fixed inset-y-0 left-0 w-[240px] flex flex-col h-screen overflow-y-auto">
+      <div className="px-5 pt-6 pb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-md flex items-center justify-center bg-white p-1.5">
+            <img src={logo} alt="Logo Arbrent" className="w-full h-full object-contain" />
+          </div>
+          <div>
+            <div className="text-[15px] font-semibold tracking-tight">Arbrent</div>
+            <div className="text-[11px]" style={{ color: "#a8b3e8" }}>Contabilidade · Experiência</div>
           </div>
         </div>
+      </div>
 
-        <nav className="flex-1 px-2 space-y-4">
-          {groups.map((g) => (
+      <nav className="flex-1 px-2 space-y-4">
+        {groups.map((g) => {
+          const visibleItems = g.items.filter(
+            (it) => !it.supervisorOnly || isSupervisor,
+          );
+          if (visibleItems.length === 0) return null;
+          return (
             <div key={g.label}>
               <div className="px-3 mb-1.5 uppercase text-[10px] tracking-wider font-semibold" style={{ color: "#4f6bab" }}>{g.label}</div>
               <div className="space-y-1">
-                {g.items.map((it) => {
+                {visibleItems.map((it) => {
                   const active = it.to === "/" ? location.pathname === "/" : location.pathname.startsWith(it.to);
                   const badge = it.badgeKey ? counts[it.badgeKey] : 0;
                   const badgeColor = it.badgeKey === "risco" ? "#ef4444" : "#f59e0b";
@@ -135,27 +152,36 @@ export function Sidebar() {
                 })}
               </div>
             </div>
-          ))}
-        </nav>
+          );
+        })}
+      </nav>
 
-        <div className="px-2 py-2" style={{ borderTop: "1px solid #1a2d8a" }}>
-          <SinoNotificacoes count={naoLidas} onClick={abrirNotifPainel} />
-        </div>
+      <div className="px-2 py-2" style={{ borderTop: "1px solid #1a2d8a" }}>
+        <SinoNotificacoes count={naoLidas} onClick={abrirNotifPainel} />
+      </div>
 
-        <div className="px-4 py-4 border-t" style={{ borderColor: "#1a2d8a" }}>
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-semibold" style={{ background: "#1a2d8a" }}>AB</div>
-            <div className="flex-1 min-w-0">
-              <div className="text-[12px] font-medium truncate">Ana Beatriz</div>
-              <div className="text-[10px] truncate" style={{ color: "#a8b3e8" }}>Analista de DP</div>
-            </div>
-            <button aria-label="Sair" title="Sair" className="p-1.5 rounded hover:opacity-80" style={{ color: "#a8b3e8" }}>
-              <Icon d="M15 12H3M9 6L3 12l6 6M21 4v16" />
-            </button>
+      <div className="px-4 py-4 border-t" style={{ borderColor: "#1a2d8a" }}>
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-semibold flex-shrink-0" style={{ background: "#1a2d8a" }}>
+            {profile ? initials(profile.nome) : "?"}
           </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[12px] font-medium truncate">{profile?.nome ?? "…"}</div>
+            <div className="text-[10px] truncate" style={{ color: "#a8b3e8" }}>
+              {profile?.role === "supervisor" ? "Supervisor" : "Analista"}
+            </div>
+          </div>
+          <button
+            aria-label="Sair"
+            title="Sair"
+            onClick={() => signOut()}
+            className="p-1.5 rounded hover:opacity-80 transition-opacity"
+            style={{ color: "#a8b3e8" }}
+          >
+            <Icon d="M15 12H3M9 6L3 12l6 6M21 4v16" />
+          </button>
         </div>
-      </aside>
-
-    </>
+      </div>
+    </aside>
   );
 }

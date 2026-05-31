@@ -3,7 +3,8 @@ import { useNavigate } from "@tanstack/react-router";
 import { addWeeks, endOfWeek, format, isWithinInterval, parseISO, startOfWeek } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { COLORS } from "@/constants/colors";
-import { useAppStore } from "@/store/appStore";
+import { useEmpresas } from "@/hooks/useEmpresas";
+import { useContratos } from "@/hooks/useContratos";
 
 type Cell = { empresaId: string; weekIdx: number; count: number; weekStart: Date; weekEnd: Date; empresaNome: string };
 
@@ -15,8 +16,8 @@ function cellColor(n: number) {
 }
 
 export function HeatmapVencimentos() {
-  const empresas = useAppStore((s) => s.empresas);
-  const contratos = useAppStore((s) => s.contratos);
+  const { data: empresas = [] } = useEmpresas();
+  const { data: contratos = [] } = useContratos();
   const navigate = useNavigate();
 
   const { weeks, rows } = useMemo(() => {

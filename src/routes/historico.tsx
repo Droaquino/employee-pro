@@ -4,7 +4,7 @@ import { ptBR } from "date-fns/locale";
 import { PageHeader, Surface } from "@/components/Surface";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { EmptyState } from "@/components/EmptyState";
-import { useAppStore } from "@/store/appStore";
+import { useHistorico } from "@/hooks/useHistorico";
 
 export const Route = createFileRoute("/historico")({
   head: () => ({
@@ -26,7 +26,7 @@ const TIPO_LABEL: Record<string, { label: string; cor: string }> = {
 };
 
 function HistoricoPage() {
-  const historico = useAppStore((s) => s.historico);
+  const { data: historico = [] } = useHistorico();
 
   return (
     <div>

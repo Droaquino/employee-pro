@@ -4,7 +4,8 @@ import { differenceInCalendarDays, format, parseISO, startOfDay } from "date-fns
 import { toast } from "sonner";
 import { PageHeader, Surface } from "@/components/Surface";
 import { Breadcrumb } from "@/components/Breadcrumb";
-import { useAppStore } from "@/store/appStore";
+import { useEmpresas } from "@/hooks/useEmpresas";
+import { useContratos } from "@/hooks/useContratos";
 import { ContratosTable } from "@/components/ContratosTable";
 import { ContratosFilters, applyFilters, hasActiveFilters, initialFilters, type FiltersState } from "@/components/ContratosFilters";
 import { calcStatus } from "@/hooks/useStatusContrato";
@@ -32,8 +33,8 @@ function loadSession(): { empresaId: string; filters: FiltersState } {
 }
 
 function ContratosPage() {
-  const empresas = useAppStore((s) => s.empresas);
-  const contratos = useAppStore((s) => s.contratos);
+  const { data: empresas = [] } = useEmpresas();
+  const { data: contratos = [] } = useContratos();
 
   const saved = useMemo(loadSession, []);
   const [empresaId, setEmpresaId] = useState<string>(saved.empresaId);

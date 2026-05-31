@@ -10,6 +10,7 @@ export type Empresa = {
   telefone: string;
   ativo: boolean;
   criadoEm: string;
+  analistaId?: string;
 };
 
 export type Colaborador = {

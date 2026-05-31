@@ -13,7 +13,8 @@ import { ptBR } from "date-fns/locale";
 import { PageHeader } from "@/components/Surface";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { EmptyState } from "@/components/EmptyState";
-import { useAppStore } from "@/store/appStore";
+import { useEmpresas } from "@/hooks/useEmpresas";
+import { useContratos } from "@/hooks/useContratos";
 import { toCsv, downloadCsv, csvDateStamp } from "@/lib/csv";
 import { calcStatus } from "@/hooks/useStatusContrato";
 import { STATUS_LABEL, STATUS_COLOR } from "@/constants/colors";
@@ -415,8 +416,8 @@ const STATUS_FILTROS = [
 ] as const;
 
 function Relatorios() {
-  const empresas = useAppStore((s) => s.empresas);
-  const contratos = useAppStore((s) => s.contratos);
+  const { data: empresas = [] } = useEmpresas();
+  const { data: contratos = [] } = useContratos();
   const [aba, setAba] = useState<Aba>("vencimentos");
   const [busca, setBusca] = useState("");
   const [statusFiltro, setStatusFiltro] = useState("TODOS");

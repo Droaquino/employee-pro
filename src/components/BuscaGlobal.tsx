@@ -3,7 +3,8 @@ import { useNavigate, useRouter } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { calcStatus } from "@/hooks/useStatusContrato";
 import { STATUS_COLOR, STATUS_LABEL } from "@/constants/colors";
-import { useAppStore } from "@/store/appStore";
+import { useEmpresas } from "@/hooks/useEmpresas";
+import { useContratos } from "@/hooks/useContratos";
 
 type Result =
   | { type: "funcionario"; id: string; nome: string; empresa: string; status: string; diasRestantes: number; contratoId: string; empresaId: string }
@@ -14,8 +15,8 @@ export function BuscaGlobal() {
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
-  const empresas = useAppStore((s) => s.empresas);
-  const contratos = useAppStore((s) => s.contratos);
+  const { data: empresas = [] } = useEmpresas();
+  const { data: contratos = [] } = useContratos();
 
   // Ctrl+K / Cmd+K
   useEffect(() => {

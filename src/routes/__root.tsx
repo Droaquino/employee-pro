@@ -6,6 +6,7 @@ import {
   HeadContent,
   Scripts,
   useRouterState,
+  useNavigate,
 } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 
@@ -17,6 +18,7 @@ import { BuscaGlobal } from "@/components/BuscaGlobal";
 import { NotificacoesPainel } from "@/components/NotificacoesPainel";
 import { NotificacaoTopBar } from "@/components/NotificacaoTopBar";
 import { useAppStore } from "@/store/appStore";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 
 function NotFoundComponent() {
   return (
@@ -63,9 +65,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:title", content: "Arbrent — Gestão de contratos de experiência" },
       { property: "og:description", content: "Sistema Arbrent Contabilidade para gestão de contratos de experiência trabalhista." },
       { name: "twitter:description", content: "Sistema Arbrent Contabilidade para gestão de contratos de experiência trabalhista." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2ebed524-22c0-46fa-9bf7-4891f5dc7183/id-preview-ad46b899--1368a994-8a87-4872-b69e-15d4c8da7623.lovable.app-1779831356595.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2ebed524-22c0-46fa-9bf7-4891f5dc7183/id-preview-ad46b899--1368a994-8a87-4872-b69e-15d4c8da7623.lovable.app-1779831356595.png" },
-      { name: "twitter:card", content: "summary_large_image" },
       { property: "og:type", content: "website" },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
@@ -85,7 +84,6 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Barra fina de progresso no topo durante navegação */
 function NavProgressBar() {
   const isLoading = useRouterState({ select: (s) => s.isLoading });
   const [visible, setVisible] = useState(false);
@@ -113,53 +111,96 @@ function NavProgressBar() {
   );
 }
 
-/** Wrapper com animação de entrada de página */
 function PageTransition({ children, routeKey }: { children: React.ReactNode; routeKey: string }) {
   const [animKey, setAnimKey] = useState(routeKey);
+  useEffect(() => { setAnimKey(routeKey); }, [routeKey]);
+  return <div key={animKey} className="page-enter">{children}</div>;
+}
+
+/** Guard: redireciona para /login se não logado */
+function AuthGuard({ children }: { children: React.ReactNode }) {
+  const { session, loading } = useAuth();
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
-    setAnimKey(routeKey);
-  }, [routeKey]);
+    if (!loading && !session && pathname !== "/login") {
+      navigate({ to: "/login" });
+    }
+  }, [loading, session, pathname, navigate]);
 
-  return (
-    <div key={animKey} className="page-enter">
-      {children}
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center" style={{ background: "#f0f2f8" }}>
+        <div className="flex flex-col items-center gap-3">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center"
+            style={{ background: "#071040" }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8ecff" strokeWidth="2">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+          </div>
+          <p className="text-[13px]" style={{ color: "#64748b" }}>Carregando…</p>
+        </div>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
 }
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isClientPanel = /^\/cliente\/[^/]+\/painel/.test(pathname);
+  const isLoginPage = pathname === "/login";
   const notifPainelOpen = useAppStore((s) => s.notifPainelOpen);
   const fecharNotifPainel = useAppStore((s) => s.fecharNotifPainel);
 
   if (isClientPanel) {
     return (
       <QueryClientProvider client={queryClient}>
-        <Outlet />
-        <Toaster richColors position="bottom-right" />
+        <AuthProvider>
+          <Outlet />
+          <Toaster richColors position="bottom-right" />
+        </AuthProvider>
+      </QueryClientProvider>
+    );
+  }
+
+  if (isLoginPage) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <Outlet />
+          <Toaster richColors position="bottom-right" />
+        </AuthProvider>
       </QueryClientProvider>
     );
   }
 
   return (
     <QueryClientProvider client={queryClient}>
-      <NavProgressBar />
-      <div style={{ background: "#f0f2f8", minHeight: "100vh" }}>
-        <Sidebar />
-        <main style={{ marginLeft: 240, padding: 24 }}>
-          <PageTransition routeKey={pathname}>
-            <Outlet />
-          </PageTransition>
-        </main>
-        <Toaster richColors position="bottom-right" />
-        <CalculadoraPrazo />
-        <BuscaGlobal />
-        <NotificacaoTopBar />
-        <NotificacoesPainel open={notifPainelOpen} onClose={fecharNotifPainel} />
-      </div>
+      <AuthProvider>
+        <AuthGuard>
+          <NavProgressBar />
+          <div style={{ background: "#f0f2f8", minHeight: "100vh" }}>
+            <Sidebar />
+            <main style={{ marginLeft: 240, padding: 24 }}>
+              <PageTransition routeKey={pathname}>
+                <Outlet />
+              </PageTransition>
+            </main>
+            <Toaster richColors position="bottom-right" />
+            <CalculadoraPrazo />
+            <BuscaGlobal />
+            <NotificacaoTopBar />
+            <NotificacoesPainel open={notifPainelOpen} onClose={fecharNotifPainel} />
+          </div>
+        </AuthGuard>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

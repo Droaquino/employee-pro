@@ -9,8 +9,10 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UsuariosRouteImport } from './routes/usuarios'
 import { Route as RelatoriosRouteImport } from './routes/relatorios'
 import { Route as ProximosVencimentosRouteImport } from './routes/proximos-vencimentos'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as HistoricoRouteImport } from './routes/historico'
 import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as EmRiscoRouteImport } from './routes/em-risco'
@@ -20,6 +22,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as EmpresasIdRouteImport } from './routes/empresas_.$id'
 import { Route as ClienteIdPainelRouteImport } from './routes/cliente.$id.painel'
 
+const UsuariosRoute = UsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RelatoriosRoute = RelatoriosRouteImport.update({
   id: '/relatorios',
   path: '/relatorios',
@@ -28,6 +35,11 @@ const RelatoriosRoute = RelatoriosRouteImport.update({
 const ProximosVencimentosRoute = ProximosVencimentosRouteImport.update({
   id: '/proximos-vencimentos',
   path: '/proximos-vencimentos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoricoRoute = HistoricoRouteImport.update({
@@ -78,8 +90,10 @@ export interface FileRoutesByFullPath {
   '/em-risco': typeof EmRiscoRoute
   '/empresas': typeof EmpresasRoute
   '/historico': typeof HistoricoRoute
+  '/login': typeof LoginRoute
   '/proximos-vencimentos': typeof ProximosVencimentosRoute
   '/relatorios': typeof RelatoriosRoute
+  '/usuarios': typeof UsuariosRoute
   '/empresas/$id': typeof EmpresasIdRoute
   '/cliente/$id/painel': typeof ClienteIdPainelRoute
 }
@@ -90,8 +104,10 @@ export interface FileRoutesByTo {
   '/em-risco': typeof EmRiscoRoute
   '/empresas': typeof EmpresasRoute
   '/historico': typeof HistoricoRoute
+  '/login': typeof LoginRoute
   '/proximos-vencimentos': typeof ProximosVencimentosRoute
   '/relatorios': typeof RelatoriosRoute
+  '/usuarios': typeof UsuariosRoute
   '/empresas/$id': typeof EmpresasIdRoute
   '/cliente/$id/painel': typeof ClienteIdPainelRoute
 }
@@ -103,8 +119,10 @@ export interface FileRoutesById {
   '/em-risco': typeof EmRiscoRoute
   '/empresas': typeof EmpresasRoute
   '/historico': typeof HistoricoRoute
+  '/login': typeof LoginRoute
   '/proximos-vencimentos': typeof ProximosVencimentosRoute
   '/relatorios': typeof RelatoriosRoute
+  '/usuarios': typeof UsuariosRoute
   '/empresas_/$id': typeof EmpresasIdRoute
   '/cliente/$id/painel': typeof ClienteIdPainelRoute
 }
@@ -117,8 +135,10 @@ export interface FileRouteTypes {
     | '/em-risco'
     | '/empresas'
     | '/historico'
+    | '/login'
     | '/proximos-vencimentos'
     | '/relatorios'
+    | '/usuarios'
     | '/empresas/$id'
     | '/cliente/$id/painel'
   fileRoutesByTo: FileRoutesByTo
@@ -129,8 +149,10 @@ export interface FileRouteTypes {
     | '/em-risco'
     | '/empresas'
     | '/historico'
+    | '/login'
     | '/proximos-vencimentos'
     | '/relatorios'
+    | '/usuarios'
     | '/empresas/$id'
     | '/cliente/$id/painel'
   id:
@@ -141,8 +163,10 @@ export interface FileRouteTypes {
     | '/em-risco'
     | '/empresas'
     | '/historico'
+    | '/login'
     | '/proximos-vencimentos'
     | '/relatorios'
+    | '/usuarios'
     | '/empresas_/$id'
     | '/cliente/$id/painel'
   fileRoutesById: FileRoutesById
@@ -154,14 +178,23 @@ export interface RootRouteChildren {
   EmRiscoRoute: typeof EmRiscoRoute
   EmpresasRoute: typeof EmpresasRoute
   HistoricoRoute: typeof HistoricoRoute
+  LoginRoute: typeof LoginRoute
   ProximosVencimentosRoute: typeof ProximosVencimentosRoute
   RelatoriosRoute: typeof RelatoriosRoute
+  UsuariosRoute: typeof UsuariosRoute
   EmpresasIdRoute: typeof EmpresasIdRoute
   ClienteIdPainelRoute: typeof ClienteIdPainelRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/usuarios': {
+      id: '/usuarios'
+      path: '/usuarios'
+      fullPath: '/usuarios'
+      preLoaderRoute: typeof UsuariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/relatorios': {
       id: '/relatorios'
       path: '/relatorios'
@@ -174,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/proximos-vencimentos'
       fullPath: '/proximos-vencimentos'
       preLoaderRoute: typeof ProximosVencimentosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/historico': {
@@ -242,8 +282,10 @@ const rootRouteChildren: RootRouteChildren = {
   EmRiscoRoute: EmRiscoRoute,
   EmpresasRoute: EmpresasRoute,
   HistoricoRoute: HistoricoRoute,
+  LoginRoute: LoginRoute,
   ProximosVencimentosRoute: ProximosVencimentosRoute,
   RelatoriosRoute: RelatoriosRoute,
+  UsuariosRoute: UsuariosRoute,
   EmpresasIdRoute: EmpresasIdRoute,
   ClienteIdPainelRoute: ClienteIdPainelRoute,
 }

@@ -5,7 +5,7 @@ import { acaoRecomendada, calcStatus, maskCpf } from "@/hooks/useStatusContrato"
 import { STATUS_COLOR, STATUS_LABEL } from "@/constants/colors";
 import { formatDiasRestantes } from "@/lib/format";
 import { EmptyState } from "@/components/EmptyState";
-import { useAppStore } from "@/store/appStore";
+import { useRenovarContratos } from "@/hooks/useContratos";
 import type { Contrato } from "@/data/mock";
 
 type SortKey = "funcionarioNome" | "cargo" | "dataAdmissao" | "vencimentoSegundo" | "diasRestantes" | "status";
@@ -107,7 +107,7 @@ export function ContratosTable({ contratos, selectable, selected = [], onSelecti
   const [observations, setObservations] = useState<Record<string, string>>({});
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const renovarContratos = useAppStore((s) => s.renovarContratos);
+  const renovarMutation = useRenovarContratos();
 
   const rows = useMemo(() => {
     const enriched = contratos.map((c) => ({ c, info: calcStatus(c) }));
@@ -292,7 +292,7 @@ export function ContratosTable({ contratos, selectable, selected = [], onSelecti
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              renovarContratos([c.id]);
+                              renovarMutation.mutate([c.id]);
                               handleAction(c.id, `contrato renovado — ${c.funcionarioNome}`);
                             }}
                             className="px-4 py-2 rounded-md text-[13px] font-medium text-white hover:opacity-90 transition-opacity"

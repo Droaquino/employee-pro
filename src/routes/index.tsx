@@ -5,11 +5,12 @@ import { EmpresasBarChart } from "@/components/charts/EmpresasBarChart";
 import { VencimentosBarChart } from "@/components/charts/VencimentosBarChart";
 import { EvolucaoLineChart } from "@/components/charts/EvolucaoLineChart";
 import { HeatmapVencimentos } from "@/components/charts/HeatmapVencimentos";
-import { useAppStore } from "@/store/appStore";
 import { PainelAcaoDia } from "@/components/PainelAcaoDia";
 import { ChartInsight } from "@/components/ChartInsight";
 import { insightStatus, insightEmpresas, insightVencimentos, insightEvolucao, insightHeatmap } from "@/lib/insights";
 import { useMemo } from "react";
+import { useEmpresas } from "@/hooks/useEmpresas";
+import { useContratos } from "@/hooks/useContratos";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -22,8 +23,8 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const empresas = useAppStore((s) => s.empresas);
-  const contratos = useAppStore((s) => s.contratos);
+  const { data: empresas = [] } = useEmpresas();
+  const { data: contratos = [] } = useContratos();
 
   const iStatus = useMemo(() => insightStatus(contratos), [contratos]);
   const iEmpresas = useMemo(() => insightEmpresas(empresas, contratos), [empresas, contratos]);

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { useAppStore } from "@/store/appStore";
+import { useContratos } from "@/hooks/useContratos";
 import { calcStatus } from "@/hooks/useStatusContrato";
 
 /** Anima um número de 0 até `target` em `duration` ms */
@@ -29,7 +29,7 @@ function useCountUp(target: number, duration = 700) {
 }
 
 export function PainelAcaoDia() {
-  const contratos = useAppStore((s) => s.contratos);
+  const { data: contratos = [] } = useContratos();
 
   const counts = useMemo(() => {
     let urgente = 0;
