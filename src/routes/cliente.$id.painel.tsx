@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useAppStore } from "@/store/appStore";
@@ -21,7 +22,11 @@ export const Route = createFileRoute("/cliente/$id/painel")({
 function PainelCliente() {
   const { id } = Route.useParams();
   const empresa = useAppStore((s) => s.empresas.find((e) => e.id === id));
-  const todos = useAppStore((s) => s.contratos.filter((c) => c.empresaId === id && !c.encerrado));
+  const allContratos = useAppStore((s) => s.contratos);
+  const todos = useMemo(
+    () => allContratos.filter((c) => c.empresaId === id && !c.encerrado),
+    [allContratos, id],
+  );
 
   if (!empresa) throw notFound();
 
