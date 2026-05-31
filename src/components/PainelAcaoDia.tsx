@@ -127,20 +127,30 @@ function Item({
         className="inline-block rounded-full shrink-0"
         style={{ background: dot, width: 10, height: 10 }}
       />
-      <div className="flex items-baseline gap-2 flex-wrap">
-        <span
-          className="font-bold tabular-nums"
-          style={{ fontSize: 28, lineHeight: 1, color: "#fff", transition: "color 0.3s" }}
-        >
-          {animated}
-        </span>
-        <span style={{ fontSize: 13, color: "#a8c7ff" }}>{label}</span>
+      <div className="flex flex-col gap-1">
+        <div className="flex items-baseline gap-2">
+          <span
+            className="font-bold tabular-nums"
+            style={{ fontSize: 28, lineHeight: 1, color: "#fff" }}
+          >
+            {animated}
+          </span>
+          <span style={{ fontSize: 13, color: "#a8c7ff" }}>{label}</span>
+        </div>
         <Link
           to={to}
-          className="hover:underline transition-opacity hover:opacity-80"
-          style={{ fontSize: 13, color: "#4f8ef7" }}
+          className="self-start transition-all hover:brightness-110 active:scale-95"
+          style={{
+            fontSize: 12,
+            fontWeight: 600,
+            color: "#0a1550",
+            background: "#4f8ef7",
+            borderRadius: 20,
+            padding: "3px 12px",
+            whiteSpace: "nowrap",
+          }}
         >
-          → {ctaLabel}
+          {ctaLabel}
         </Link>
       </div>
     </div>
