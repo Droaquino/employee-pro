@@ -1,10 +1,9 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { differenceInCalendarDays, parseISO, startOfDay } from "date-fns";
 import { useAppStore } from "@/store/appStore";
 import { useNotificacoes } from "@/hooks/useNotificacoes";
 import { SinoNotificacoes } from "@/components/SinoNotificacoes";
-import { NotificacoesPainel } from "@/components/NotificacoesPainel";
 import logo from "@/assets/arbrent-logo.png";
 
 type Item = {
@@ -45,9 +44,8 @@ const groups: Group[] = [
 export function Sidebar() {
   const location = useLocation();
   const contratos = useAppStore((s) => s.contratos);
+  const abrirNotifPainel = useAppStore((s) => s.abrirNotifPainel);
   const { naoLidas, naoLidasPorTipo } = useNotificacoes();
-  const [painelOpen, setPainelOpen] = useState(false);
-  const sinoRef = useRef<HTMLButtonElement | null>(null);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -141,7 +139,7 @@ export function Sidebar() {
         </nav>
 
         <div className="px-2 py-2" style={{ borderTop: "1px solid #1a2d8a" }}>
-          <SinoNotificacoes ref={sinoRef} count={naoLidas} onClick={() => setPainelOpen(true)} />
+          <SinoNotificacoes count={naoLidas} onClick={abrirNotifPainel} />
         </div>
 
         <div className="px-4 py-4 border-t" style={{ borderColor: "#1a2d8a" }}>
@@ -158,11 +156,6 @@ export function Sidebar() {
         </div>
       </aside>
 
-      <NotificacoesPainel
-        open={painelOpen}
-        onClose={() => setPainelOpen(false)}
-        returnFocusRef={sinoRef}
-      />
     </>
   );
 }

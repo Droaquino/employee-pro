@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { COLORS } from "@/constants/colors";
 
 type Props = {
@@ -6,7 +6,7 @@ type Props = {
   onClick: () => void;
 };
 
-export const SinoNotificacoes = forwardRef<HTMLButtonElement, Props>(function SinoNotificacoes({ count, onClick }, ref) {
+export function SinoNotificacoes({ count, onClick }: Props) {
   const [shake, setShake] = useState(false);
   const [prev, setPrev] = useState(count);
 
@@ -23,7 +23,6 @@ export const SinoNotificacoes = forwardRef<HTMLButtonElement, Props>(function Si
 
   return (
     <button
-      ref={ref}
       type="button"
       onClick={onClick}
       aria-label={`Notificações${count > 0 ? `, ${count} não lidas` : ""}`}
@@ -38,15 +37,11 @@ export const SinoNotificacoes = forwardRef<HTMLButtonElement, Props>(function Si
           <span
             className="absolute flex items-center justify-center font-bold text-white"
             style={{
-              top: -6,
-              right: -8,
-              minWidth: 18,
-              height: 18,
-              padding: "0 4px",
-              borderRadius: 9,
+              top: -6, right: -8,
+              minWidth: 18, height: 18,
+              padding: "0 4px", borderRadius: 9,
               background: COLORS.risco,
-              fontSize: 10,
-              lineHeight: 1,
+              fontSize: 10, lineHeight: 1,
               border: "2px solid #071040",
             }}
           >
@@ -57,7 +52,7 @@ export const SinoNotificacoes = forwardRef<HTMLButtonElement, Props>(function Si
       <span className="flex-1 text-left">Notificações</span>
     </button>
   );
-});
+}
 
 function BellIcon({ hasDot }: { hasDot: boolean }) {
   return (

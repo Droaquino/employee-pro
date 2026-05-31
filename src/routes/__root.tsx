@@ -14,6 +14,9 @@ import { Sidebar } from "@/components/Sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { CalculadoraPrazo } from "@/components/CalculadoraPrazo";
 import { BuscaGlobal } from "@/components/BuscaGlobal";
+import { NotificacoesPainel } from "@/components/NotificacoesPainel";
+import { NotificacaoTopBar } from "@/components/NotificacaoTopBar";
+import { useAppStore } from "@/store/appStore";
 
 function NotFoundComponent() {
   return (
@@ -129,6 +132,8 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isClientPanel = /^\/cliente\/[^/]+\/painel/.test(pathname);
+  const notifPainelOpen = useAppStore((s) => s.notifPainelOpen);
+  const fecharNotifPainel = useAppStore((s) => s.fecharNotifPainel);
 
   if (isClientPanel) {
     return (
@@ -152,6 +157,8 @@ function RootComponent() {
         <Toaster richColors position="bottom-right" />
         <CalculadoraPrazo />
         <BuscaGlobal />
+        <NotificacaoTopBar />
+        <NotificacoesPainel open={notifPainelOpen} onClose={fecharNotifPainel} />
       </div>
     </QueryClientProvider>
   );

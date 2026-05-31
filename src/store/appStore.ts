@@ -4,6 +4,16 @@ import { dadosFixos } from "@/data/dadosFixos";
 
 const seedContratos: Contrato[] = dadosFixos.contratos;
 
+// ── Notification lidas — persisted in localStorage ────────────────────────────
+const NOTIF_KEY = "arbrent_notif_lidas";
+const loadNotifLidas = (): string[] => {
+  if (typeof window === "undefined") return [];
+  try { return JSON.parse(localStorage.getItem(NOTIF_KEY) ?? "[]"); } catch { return []; }
+};
+const saveNotifLidas = (ids: string[]) => {
+  try { localStorage.setItem(NOTIF_KEY, JSON.stringify(ids)); } catch {}
+};
+
 export type HistoryEvent = {
   id: string;
   at: string;
@@ -20,6 +30,10 @@ type State = {
   contratos: Contrato[];
   colaboradores: Colaborador[];
   historico: HistoryEvent[];
+  // Notifications shared state
+  notifLidas: string[];
+  notifPainelOpen: boolean;
+  // Actions
   upsertEmpresa: (e: Empresa) => void;
   removeEmpresa: (id: string) => void;
   toggleAtivo: (id: string) => void;
@@ -28,6 +42,10 @@ type State = {
   upsertColaborador: (c: Colaborador) => void;
   removeColaborador: (id: string) => void;
   toggleAtivoColaborador: (id: string) => void;
+  marcarNotifLida: (id: string) => void;
+  marcarTodasNotifLidas: (ids: string[]) => void;
+  abrirNotifPainel: () => void;
+  fecharNotifPainel: () => void;
 };
 
 const log = (h: HistoryEvent[], ev: Omit<HistoryEvent, "id" | "at">): HistoryEvent[] => [
@@ -40,6 +58,8 @@ export const useAppStore = create<State>((set) => ({
   contratos: seedContratos,
   colaboradores: [],
   historico: [],
+  notifLidas: loadNotifLidas(),
+  notifPainelOpen: false,
 
   upsertEmpresa: (e) =>
     set((s) => {
@@ -132,4 +152,22 @@ export const useAppStore = create<State>((set) => ({
     set((s) => ({
       colaboradores: s.colaboradores.map((c) => (c.id === id ? { ...c, ativo: !c.ativo } : c)),
     })),
+
+  marcarNotifLida: (id) =>
+    set((s) => {
+      if (s.notifLidas.includes(id)) return {};
+      const next = [...s.notifLidas, id];
+      saveNotifLidas(next);
+      return { notifLidas: next };
+    }),
+
+  marcarTodasNotifLidas: (ids) =>
+    set((s) => {
+      const merged = Array.from(new Set([...s.notifLidas, ...ids]));
+      saveNotifLidas(merged);
+      return { notifLidas: merged };
+    }),
+
+  abrirNotifPainel: () => set({ notifPainelOpen: true }),
+  fecharNotifPainel: () => set({ notifPainelOpen: false }),
 }));

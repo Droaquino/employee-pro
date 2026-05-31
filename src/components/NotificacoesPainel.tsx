@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { isToday, isYesterday, isThisWeek } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -14,25 +14,32 @@ type Props = {
 };
 
 const FILTROS: { key: FiltroNotif; label: string; cor: string }[] = [
-  { key: "todos", label: "Todos", cor: COLORS.brand },
+  { key: "todos",   label: "Todos",   cor: COLORS.brand },
   { key: "urgente", label: "Urgente", cor: COLORS.risco },
   { key: "atencao", label: "Atenção", cor: COLORS.proximo },
-  { key: "info", label: "Info", cor: COLORS.brandAccent },
+  { key: "info",    label: "Info",    cor: COLORS.brandAccent },
 ];
 
 function grupo(d: Date): "HOJE" | "ONTEM" | "ESTA SEMANA" | "MAIS ANTIGAS" {
-  if (isToday(d)) return "HOJE";
+  if (isToday(d))    return "HOJE";
   if (isYesterday(d)) return "ONTEM";
   if (isThisWeek(d, { locale: ptBR })) return "ESTA SEMANA";
   return "MAIS ANTIGAS";
 }
 
 export function NotificacoesPainel({ open, onClose, returnFocusRef }: Props) {
-  const { notificacoesFiltradas, naoLidas, filtro, filtrar, marcarComoLida, marcarTodasComoLidas } = useNotificacoes();
+  const { notificacoes, naoLidas, marcarComoLida, marcarTodasComoLidas } = useNotificacoes();
   const navigate = useNavigate();
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
 
-  // ESC para fechar + focus management
+  const [filtro, setFiltro] = useState<FiltroNotif>("todos");
+
+  const notificacoesFiltradas = useMemo(
+    () => filtro === "todos" ? notificacoes : notificacoes.filter((n) => n.tipo === filtro),
+    [notificacoes, filtro],
+  );
+
+  // ESC to close + focus management
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -119,7 +126,7 @@ export function NotificacoesPainel({ open, onClose, returnFocusRef }: Props) {
           </div>
         </div>
 
-        {/* Filtros */}
+        {/* Filters */}
         <div
           className="px-4 py-3 shrink-0 flex gap-2 overflow-x-auto"
           style={{ borderBottom: `1px solid ${COLORS.borderSoft}` }}
@@ -129,7 +136,7 @@ export function NotificacoesPainel({ open, onClose, returnFocusRef }: Props) {
             return (
               <button
                 key={f.key}
-                onClick={() => filtrar(f.key)}
+                onClick={() => setFiltro(f.key)}
                 className="text-[11px] font-medium px-3 py-1 rounded-full whitespace-nowrap transition-colors"
                 style={{
                   background: ativo ? f.cor : "transparent",
@@ -143,7 +150,7 @@ export function NotificacoesPainel({ open, onClose, returnFocusRef }: Props) {
           })}
         </div>
 
-        {/* Lista */}
+        {/* List */}
         <div className="flex-1 overflow-y-auto">
           {grupos.length === 0 ? (
             <div className="flex flex-col items-center justify-center text-center py-16 px-6">

@@ -1,25 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { differenceInCalendarDays, format, getISOWeek, getISOWeekYear, parseISO, startOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useAppStore } from "@/store/appStore";
-
-const STORAGE_KEY = "arbrent_notificacoes";
-
-type Stored = { lidas: string[]; lastResumo: string | null };
-
-function loadStored(): Stored {
-  if (typeof window === "undefined") return { lidas: [], lastResumo: null };
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as Stored) : { lidas: [], lastResumo: null };
-  } catch {
-    return { lidas: [], lastResumo: null };
-  }
-}
-
-function saveStored(s: Stored) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch { /* ignore */ }
-}
 
 export type TipoNotif = "urgente" | "atencao" | "info";
 export type FiltroNotif = "todos" | TipoNotif;
@@ -40,30 +22,35 @@ export type Notificacao = {
 
 const TIPO_RANK: Record<TipoNotif, number> = { urgente: 0, atencao: 1, info: 2 };
 
+// History events that should surface as notifications
+const HISTORICO_NOTIF = new Set([
+  "CONTRATO_RENOVADO",
+  "CONTRATO_ENCERRADO",
+  "COLABORADOR_CRIADO",
+  "EMPRESA_CRIADA",
+]);
+
+const HISTORICO_LABEL: Record<string, { titulo: (d: string) => string; rota: string; rotaLabel: string }> = {
+  CONTRATO_RENOVADO:  { titulo: (d) => d, rota: "/contratos",  rotaLabel: "Ver contratos" },
+  CONTRATO_ENCERRADO: { titulo: (d) => d, rota: "/historico",  rotaLabel: "Ver histórico" },
+  COLABORADOR_CRIADO: { titulo: (d) => d, rota: "/empresas",   rotaLabel: "Ver empresas" },
+  EMPRESA_CRIADA:     { titulo: (d) => d, rota: "/empresas",   rotaLabel: "Ver empresas" },
+};
+
 export function useNotificacoes() {
-  const contratos = useAppStore((s) => s.contratos);
-  const empresas = useAppStore((s) => s.empresas);
-
-  const [stored, setStored] = useState<Stored>(() => loadStored());
-  const [filtro, setFiltro] = useState<FiltroNotif>("todos");
-
-  // garantir que o resumo diário do dia seja gerado uma vez (atualiza lastResumo)
-  useEffect(() => {
-    const hoje = format(startOfDay(new Date()), "yyyy-MM-dd");
-    if (stored.lastResumo !== hoje) {
-      const next = { ...stored, lastResumo: hoje };
-      setStored(next);
-      saveStored(next);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const contratos  = useAppStore((s) => s.contratos);
+  const empresas   = useAppStore((s) => s.empresas);
+  const historico  = useAppStore((s) => s.historico);
+  const notifLidas = useAppStore((s) => s.notifLidas);
+  const _marcarLida       = useAppStore((s) => s.marcarNotifLida);
+  const _marcarTodasLidas = useAppStore((s) => s.marcarTodasNotifLidas);
 
   const empresaMap = useMemo(() => new Map(empresas.map((e) => [e.id, e])), [empresas]);
 
   const notificacoes = useMemo<Notificacao[]>(() => {
     const hoje = startOfDay(new Date());
     const agora = new Date();
-    const lidas = new Set(stored.lidas);
+    const lidas = new Set(notifLidas);
     const list: Notificacao[] = [];
     const seen = new Set<string>();
 
@@ -73,16 +60,16 @@ export function useNotificacoes() {
       list.push({ ...n, lida: lidas.has(n.id) });
     };
 
-    // Por contrato
+    // ── Contract-based notifications ─────────────────────────────────────────
     const semana = `${getISOWeekYear(hoje)}-W${getISOWeek(hoje)}`;
-    const porEmpresa7d = new Map<string, number>();
+    const porEmpresa7d  = new Map<string, number>();
     const porEmpresa30d = new Map<string, number>();
 
     for (const c of contratos) {
       if (c.encerrado) continue;
       const venc = startOfDay(parseISO(c.vencimentoSegundo));
       const dias = differenceInCalendarDays(venc, hoje);
-      const emp = empresaMap.get(c.empresaId);
+      const emp     = empresaMap.get(c.empresaId);
       const empNome = emp?.nomeFantasia ?? "Empresa";
       const rotaContrato = `/empresas/${c.empresaId}`;
 
@@ -93,24 +80,18 @@ export function useNotificacoes() {
           categoria: "vencido_nao_regularizado",
           titulo: `${c.funcionarioNome} — contrato VENCIDO`,
           descricao: `Venceu há ${Math.abs(dias)} ${Math.abs(dias) === 1 ? "dia" : "dias"} e não foi regularizado. ${empNome}`,
-          empresaId: c.empresaId,
-          contratoId: c.id,
-          criadaEm: agora,
-          rota: rotaContrato,
-          rotaLabel: "Ver contrato",
+          empresaId: c.empresaId, contratoId: c.id,
+          criadaEm: agora, rota: rotaContrato, rotaLabel: "Ver contrato",
         });
       } else if (dias <= 7) {
         push({
           id: `vencimento_iminente_${c.id}`,
           tipo: "urgente",
           categoria: "vencimento_iminente",
-          titulo: `${c.funcionarioNome} — vence em ${dias} ${dias === 1 ? "dia" : "dias"}`,
+          titulo: `${c.funcionarioNome} — vence em ${dias === 0 ? "hoje" : `${dias} ${dias === 1 ? "dia" : "dias"}`}`,
           descricao: `${empNome} · ${c.cargo} · 2ª prorrogação`,
-          empresaId: c.empresaId,
-          contratoId: c.id,
-          criadaEm: agora,
-          rota: rotaContrato,
-          rotaLabel: "Ver contrato",
+          empresaId: c.empresaId, contratoId: c.id,
+          criadaEm: agora, rota: rotaContrato, rotaLabel: "Ver contrato",
         });
       } else if (dias <= 15) {
         push({
@@ -119,11 +100,8 @@ export function useNotificacoes() {
           categoria: "proximo_vencimento",
           titulo: `${c.funcionarioNome} — vence em ${dias} dias`,
           descricao: `Agende avaliação. ${empNome} · ${c.cargo}`,
-          empresaId: c.empresaId,
-          contratoId: c.id,
-          criadaEm: agora,
-          rota: rotaContrato,
-          rotaLabel: "Ver contrato",
+          empresaId: c.empresaId, contratoId: c.id,
+          criadaEm: agora, rota: rotaContrato, rotaLabel: "Ver contrato",
         });
       } else if (dias <= 30) {
         push({
@@ -132,19 +110,16 @@ export function useNotificacoes() {
           categoria: "janela_decisao",
           titulo: `${c.funcionarioNome} — vence em ${dias} dias`,
           descricao: `Defina se será efetivado ou encerrado. ${empNome}`,
-          empresaId: c.empresaId,
-          contratoId: c.id,
-          criadaEm: agora,
-          rota: rotaContrato,
-          rotaLabel: "Ver contrato",
+          empresaId: c.empresaId, contratoId: c.id,
+          criadaEm: agora, rota: rotaContrato, rotaLabel: "Ver contrato",
         });
       }
 
-      if (dias >= 0 && dias <= 7) porEmpresa7d.set(c.empresaId, (porEmpresa7d.get(c.empresaId) ?? 0) + 1);
+      if (dias >= 0 && dias <= 7)  porEmpresa7d.set(c.empresaId,  (porEmpresa7d.get(c.empresaId)  ?? 0) + 1);
       if (dias >= 0 && dias <= 30) porEmpresa30d.set(c.empresaId, (porEmpresa30d.get(c.empresaId) ?? 0) + 1);
     }
 
-    // Lote por empresa — crítico (>=3 em 7d)
+    // Batch by company — critical (≥3 in 7d)
     for (const [empId, n] of porEmpresa7d) {
       if (n < 3) continue;
       const emp = empresaMap.get(empId);
@@ -154,15 +129,12 @@ export function useNotificacoes() {
         categoria: "lote_empresa_critico",
         titulo: `${emp?.nomeFantasia ?? "Empresa"} — ${n} contratos vencem esta semana`,
         descricao: "Ação imediata necessária para evitar passivo trabalhista",
-        empresaId: empId,
-        contratoId: null,
-        criadaEm: agora,
-        rota: `/empresas/${empId}`,
-        rotaLabel: "Ver empresa",
+        empresaId: empId, contratoId: null,
+        criadaEm: agora, rota: `/empresas/${empId}`, rotaLabel: "Ver empresa",
       });
     }
 
-    // Lote por empresa — atenção (>=5 em 30d)
+    // Batch by company — attention (≥5 in 30d)
     for (const [empId, n] of porEmpresa30d) {
       if (n < 5) continue;
       const emp = empresaMap.get(empId);
@@ -172,15 +144,32 @@ export function useNotificacoes() {
         categoria: "lote_empresa_atencao",
         titulo: `${emp?.nomeFantasia ?? "Empresa"} — ${n} contratos vencem nos próximos 30 dias`,
         descricao: "Planeje as avaliações com antecedência",
-        empresaId: empId,
-        contratoId: null,
-        criadaEm: agora,
-        rota: `/empresas/${empId}`,
-        rotaLabel: "Ver empresa",
+        empresaId: empId, contratoId: null,
+        criadaEm: agora, rota: `/empresas/${empId}`, rotaLabel: "Ver empresa",
       });
     }
 
-    // Resumo diário (info)
+    // ── History-based notifications (last 24 h) ───────────────────────────────
+    const limite24h = new Date(agora.getTime() - 24 * 60 * 60 * 1000);
+    for (const ev of historico) {
+      if (!HISTORICO_NOTIF.has(ev.tipo)) continue;
+      const evAt = new Date(ev.at);
+      if (evAt < limite24h) continue;
+      const meta = HISTORICO_LABEL[ev.tipo];
+      push({
+        id: `historico_${ev.id}`,
+        tipo: "info",
+        categoria: ev.tipo.toLowerCase(),
+        titulo: meta.titulo(ev.descricao),
+        descricao: `Registrado ${format(evAt, "HH:mm", { locale: ptBR })}`,
+        empresaId: null, contratoId: null,
+        criadaEm: evAt,
+        rota: meta.rota,
+        rotaLabel: meta.rotaLabel,
+      });
+    }
+
+    // ── Daily summary (info) ──────────────────────────────────────────────────
     let risco = 0, proximo = 0, vencido = 0;
     for (const c of contratos) {
       if (c.encerrado) continue;
@@ -196,14 +185,11 @@ export function useNotificacoes() {
       categoria: "resumo_diario",
       titulo: `Resumo do dia — ${dataExtenso}`,
       descricao: `${risco} em risco · ${proximo} próximos do vencimento · ${vencido} vencidos`,
-      empresaId: null,
-      contratoId: null,
-      criadaEm: agora,
-      rota: "/",
-      rotaLabel: "Ver dashboard",
+      empresaId: null, contratoId: null,
+      criadaEm: agora, rota: "/", rotaLabel: "Ver dashboard",
     });
 
-    // Ordenação: não lidas (urgente > atencao > info) por data desc, depois lidas por data desc
+    // Sort: unread first (urgente > atencao > info), newest first; then read
     list.sort((a, b) => {
       if (a.lida !== b.lida) return a.lida ? 1 : -1;
       const r = TIPO_RANK[a.tipo] - TIPO_RANK[b.tipo];
@@ -212,7 +198,7 @@ export function useNotificacoes() {
     });
 
     return list;
-  }, [contratos, empresaMap, stored.lidas]);
+  }, [contratos, empresaMap, historico, notifLidas]);
 
   const naoLidas = useMemo(() => notificacoes.filter((n) => !n.lida).length, [notificacoes]);
 
@@ -222,37 +208,16 @@ export function useNotificacoes() {
     return m;
   }, [notificacoes]);
 
-  const notificacoesFiltradas = useMemo(() => {
-    if (filtro === "todos") return notificacoes;
-    return notificacoes.filter((n) => n.tipo === filtro);
-  }, [notificacoes, filtro]);
-
-  const marcarComoLida = useCallback((id: string) => {
-    setStored((prev) => {
-      if (prev.lidas.includes(id)) return prev;
-      const next = { ...prev, lidas: [...prev.lidas, id] };
-      saveStored(next);
-      return next;
-    });
-  }, []);
+  const marcarComoLida = useCallback((id: string) => _marcarLida(id), [_marcarLida]);
 
   const marcarTodasComoLidas = useCallback(() => {
-    setStored((prev) => {
-      const ids = notificacoes.map((n) => n.id);
-      const set = new Set([...prev.lidas, ...ids]);
-      const next = { ...prev, lidas: Array.from(set) };
-      saveStored(next);
-      return next;
-    });
-  }, [notificacoes]);
+    _marcarTodasLidas(notificacoes.map((n) => n.id));
+  }, [_marcarTodasLidas, notificacoes]);
 
   return {
     notificacoes,
-    notificacoesFiltradas,
     naoLidas,
     naoLidasPorTipo,
-    filtro,
-    filtrar: setFiltro,
     marcarComoLida,
     marcarTodasComoLidas,
   };
