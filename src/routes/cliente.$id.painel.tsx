@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -7,6 +7,7 @@ import { useContratos } from "@/hooks/useContratos";
 import { calcStatus } from "@/hooks/useStatusContrato";
 import { STATUS_COLOR } from "@/constants/colors";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { supabase } from "@/lib/supabase";
 
 const SEMAFORO: Record<string, string> = {
   VIGENTE: "#16a34a",
@@ -17,6 +18,10 @@ const SEMAFORO: Record<string, string> = {
 
 export const Route = createFileRoute("/cliente/$id/painel")({
   head: () => ({ meta: [{ title: "Painel do cliente — Arbrent" }] }),
+  beforeLoad: async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw redirect({ to: "/login" });
+  },
   component: PainelCliente,
 });
 
