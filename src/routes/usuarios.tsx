@@ -440,7 +440,8 @@ function InviteModal({ onClose }: { onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-xl shadow-xl p-6 bg-white"
+        className="w-full max-w-md rounded-xl shadow-xl p-6 bg-white overflow-y-auto"
+        style={{ maxHeight: "90vh" }}
         onClick={(e) => e.stopPropagation()}
       >
         {sent ? (
